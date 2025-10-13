@@ -1,0 +1,66 @@
+post:
+  summary: Создаёт новый заказ на основе выбранных пользователем деталей
+  operationId: CreateOrder
+  tags:
+    - Orders
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/create_order_request.yaml
+  responses:
+    '200':
+      description: Order created
+      content:
+        application/json:
+          schema:
+            $ref: ../components/create_order_response.yaml
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/bad_gateway_error.yaml
+    '401':
+      description: Unauthorized error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/unauthorized_error.yaml
+    '403':
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/forbidden_error.yaml
+    '429':
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/rate_limit_error.yaml
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/internal_server_error.yaml
+    '502':
+      description: Bad Gateway Error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/bad_gateway_error.yaml
+    '503':
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/service_unavailable_error.yaml
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/generic_error.yaml

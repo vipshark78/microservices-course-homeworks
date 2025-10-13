@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+// Пакет Payment содержит PaymentService API
+package payment.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/payment/v1;payment_v1";
+
+
+//PaymentService содержит API для работы с платежами
+service PaymentService {
+  //PayOrder Обрабатывает команду на оплату и возвращает transaction_uuid
+  rpc PayOrder(PayOrderRequest) returns (PayOrderResponse){
+    option(google.api.http) = {
+      post: "/v1/payment/pay"
+      body:"*"
+    };
+  }
+}
+
+// PayOrderRequest запрос на оплату заказа.
+message PayOrderRequest{
+  //UUID заказа
+  string order_uuid = 1;
+  //UUID пользователя, который инициирует оплату
+  string user_uuid = 2;
+  //Выбранный способ оплаты
+  PaymentMethod payment_method = 3;
+}
+// PayOrderResponse ответ на запрос на оплату заказа. Возвращает UUID транзакции
+message PayOrderResponse{
+  //UUID транзакции оплаты
+  string transaction_uuid = 1;
+}
+
+//PaymentMethod перечисление способов оплаты
+enum PaymentMethod{
+  //Неизвестный способ
+  UNKNOWN_UNSPECIFIED = 0;
+  //Оплата банковской картой
+  CARD = 1;
+  //Оплата через систему быстрых платежей
+  SBP = 2;
+  //Оплата кредитной картой
+  CREDIT_CARD = 3;
+  //Оплата деньгами инвестора
+  INVESTOR_MONEY = 4;
+}
+
