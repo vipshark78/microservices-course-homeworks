@@ -1,0 +1,10 @@
+name: order_uuid
+in: path
+required: true
+description: Уникальный идентификатор заказа, который необходимо получить
+schema:
+  type: string
+  format: uuid
+  minLength: 36
+  maxLength: 36
+  example: 16763be4-6022-406e-a950-fcd5018633ca
