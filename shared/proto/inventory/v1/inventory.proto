@@ -14,7 +14,7 @@ service InventoryService {
   //Возвращает информацию о детали по её UUID
   rpc GetPart(GetPartRequest) returns (GetPartResponse){
     option (google.api.http) = {
-      get: "/api/v1/inventory/{inventory_uuid}"
+      get: "/api/v1/inventory/{uuid}"
     };
   }
 
@@ -30,7 +30,7 @@ service InventoryService {
 // GetPartRequest запрос на получение информации о детали
 message GetPartRequest {
   // UUID идентификатор детали
-  string inventory_uuid = 1;
+  string uuid = 1;
 }
 
 // GetPartResponse ответ на запрос информации о детали
@@ -96,23 +96,23 @@ enum Category{
 //Dimensions Размеры детали
 message Dimensions {
   //Длина в см
-  double length =1;
+  double length = 1;
   //Ширина в см
-  double width =2;
+  double width = 2;
   //Высота в см
-  double height=3;
+  double height= 3;
   //Вес в кг
-  double weight=4;
+  double weight= 4;
 }
 
 //Manufacturer информация о производителе
 message Manufacturer {
   //Название
-  string name =1;
+  string name = 1;
   //Страна производства
-  string country =2;
+  string country = 2;
   //Сайт производителя
-  string website =3;
+  string website = 3;
 }
 
 //Value значение metadata
@@ -138,7 +138,7 @@ message PartsFilter {
   //Список категорий. Пусто — не фильтруем по категории
   repeated Category categories = 3;
   //Список стран производителей. Пусто — не фильтруем по стране
-  repeated string countries = 4;
+  repeated string manufacturer_countries = 4;
   //Список тегов. Пусто — не фильтруем по тегам
   repeated string tags = 5;
 }

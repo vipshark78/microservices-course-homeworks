@@ -74,7 +74,7 @@ func decodeCreateOrderResponse(resp *http.Response) (res CreateOrderRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CreateOrderBadRequest
+			var response BadRequestError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -249,7 +249,7 @@ func decodeCreateOrderResponse(resp *http.Response) (res CreateOrderRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CreateOrderBadGateway
+			var response BadGatewayError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -411,7 +411,7 @@ func decodeOrderByUUIDResponse(resp *http.Response) (res OrderByUUIDRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response OrderByUUIDBadRequest
+			var response BadRequestError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -621,7 +621,7 @@ func decodeOrderByUUIDResponse(resp *http.Response) (res OrderByUUIDRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response OrderByUUIDBadGateway
+			var response BadGatewayError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -742,7 +742,7 @@ func decodeOrderCancelResponse(resp *http.Response) (res OrderCancelRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response OrderCancelBadRequest
+			var response BadRequestError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -987,7 +987,7 @@ func decodeOrderCancelResponse(resp *http.Response) (res OrderCancelRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response OrderCancelBadGateway
+			var response BadGatewayError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1140,7 +1140,7 @@ func decodeOrderPayResponse(resp *http.Response) (res OrderPayRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response OrderPayBadRequest
+			var response BadRequestError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1350,7 +1350,7 @@ func decodeOrderPayResponse(resp *http.Response) (res OrderPayRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response OrderPayBadGateway
+			var response BadGatewayError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

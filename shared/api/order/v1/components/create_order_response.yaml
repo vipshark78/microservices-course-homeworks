@@ -10,7 +10,7 @@ properties:
     example: "59347286-0cde-4eae-bfbd-a9d1b2a615af"
   total_price:
     type: number
-    format: float
+    format: float64
     minimum: 0.0
     description: Общая стоимость заказа
     example: 100.0

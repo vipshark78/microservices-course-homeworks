@@ -10,15 +10,11 @@ properties:
     type: string
     format: uuid
     description: Уникальный идентификатор заказа
-    minLength: 36
-    maxLength: 36
     example: "16763be4-6022-406e-a950-fcd5018633ca"
   user_uuid:
     type: string
     format: uuid
     description: Уникальный идентификатор пользователя
-    minLength: 36
-    maxLength: 36
     example: "16763be4-6022-406e-a950-fcd5018633ca"
   part_uuids:
     type: array
@@ -26,23 +22,20 @@ properties:
       type: string
       format: uuid
       description: Уникальный идентификатор детали
-      minLength: 36
-      maxLength: 36
       example: "16763be4-6022-406e-a950-fcd5018633ca"
     minItems: 1
     description: Список уникальных идентификаторов деталей в заказе
     example: ["16763be4-6022-406e-a950-fcd5018633ca", "16763be4-6022-406e-a950-fcd5018633cb"]
   total_price:
     type: number
-    format: float
+    format: float64
     description: Общая стоимость заказа
     example: 100.12
   transaction_uuid:
     type: string
     format: uuid
+    nullable: true
     description: Уникальный идентификатор транзакции
-    minLength: 36
-    maxLength: 36
     example: "16763be4-6022-406e-a950-fcd5018633ca"
   payment_method:
     $ref: ./enums/payment_method.yaml
