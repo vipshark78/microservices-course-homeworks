@@ -28,7 +28,7 @@ func encodeCreateOrderResponse(response CreateOrderRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *CreateOrderBadRequest:
+	case *BadRequestError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -93,7 +93,7 @@ func encodeCreateOrderResponse(response CreateOrderRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *CreateOrderBadGateway:
+	case *BadGatewayError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(502)
 		span.SetStatus(codes.Error, http.StatusText(502))
@@ -139,7 +139,7 @@ func encodeOrderByUUIDResponse(response OrderByUUIDRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *OrderByUUIDBadRequest:
+	case *BadRequestError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -217,7 +217,7 @@ func encodeOrderByUUIDResponse(response OrderByUUIDRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *OrderByUUIDBadGateway:
+	case *BadGatewayError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(502)
 		span.SetStatus(codes.Error, http.StatusText(502))
@@ -256,7 +256,7 @@ func encodeOrderCancelResponse(response OrderCancelRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *OrderCancelBadRequest:
+	case *BadRequestError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -347,7 +347,7 @@ func encodeOrderCancelResponse(response OrderCancelRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *OrderCancelBadGateway:
+	case *BadGatewayError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(502)
 		span.SetStatus(codes.Error, http.StatusText(502))
@@ -393,7 +393,7 @@ func encodeOrderPayResponse(response OrderPayRes, w http.ResponseWriter, span tr
 
 		return nil
 
-	case *OrderPayBadRequest:
+	case *BadRequestError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -471,7 +471,7 @@ func encodeOrderPayResponse(response OrderPayRes, w http.ResponseWriter, span tr
 
 		return nil
 
-	case *OrderPayBadGateway:
+	case *BadGatewayError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(502)
 		span.SetStatus(codes.Error, http.StatusText(502))

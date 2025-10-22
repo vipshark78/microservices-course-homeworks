@@ -128,6 +128,119 @@ func (s *BadGatewayError) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *BadRequestError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BadRequestError) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("code")
+		e.Int(s.Code)
+	}
+	{
+		e.FieldStart("message")
+		e.Str(s.Message)
+	}
+}
+
+var jsonFieldsNameOfBadRequestError = [2]string{
+	0: "code",
+	1: "message",
+}
+
+// Decode decodes BadRequestError from json.
+func (s *BadRequestError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BadRequestError to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "code":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.Code = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "message":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BadRequestError")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBadRequestError) {
+					name = jsonFieldsNameOfBadRequestError[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BadRequestError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BadRequestError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *ConflictError) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -236,82 +349,6 @@ func (s *ConflictError) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ConflictError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes CreateOrderBadGateway as json.
-func (s *CreateOrderBadGateway) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes CreateOrderBadGateway from json.
-func (s *CreateOrderBadGateway) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode CreateOrderBadGateway to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = CreateOrderBadGateway(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *CreateOrderBadGateway) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreateOrderBadGateway) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes CreateOrderBadRequest as json.
-func (s *CreateOrderBadRequest) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes CreateOrderBadRequest from json.
-func (s *CreateOrderBadRequest) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode CreateOrderBadRequest to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = CreateOrderBadRequest(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *CreateOrderBadRequest) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreateOrderBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -456,7 +493,7 @@ func (s *CreateOrderResponse) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("total_price")
-		e.Float32(s.TotalPrice)
+		e.Float64(s.TotalPrice)
 	}
 }
 
@@ -489,8 +526,8 @@ func (s *CreateOrderResponse) Decode(d *jx.Decoder) error {
 		case "total_price":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float32()
-				s.TotalPrice = float32(v)
+				v, err := d.Float64()
+				s.TotalPrice = float64(v)
 				if err != nil {
 					return err
 				}
@@ -956,6 +993,50 @@ func (s *InternalServerError) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes PaymentMethod as json.
+func (o NilPaymentMethod) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes PaymentMethod from json.
+func (o *NilPaymentMethod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilPaymentMethod to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v PaymentMethod
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilPaymentMethod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilPaymentMethod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *NotFoundError) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -1069,6 +1150,106 @@ func (s *NotFoundError) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes PaymentMethod as json.
+func (o OptNilPaymentMethod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes PaymentMethod from json.
+func (o *OptNilPaymentMethod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilPaymentMethod to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v PaymentMethod
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilPaymentMethod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilPaymentMethod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes uuid.UUID as json.
+func (o OptNilUUID) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	json.EncodeUUID(e, o.Value)
+}
+
+// Decode decodes uuid.UUID from json.
+func (o *OptNilUUID) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilUUID to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v uuid.UUID
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	v, err := json.DecodeUUID(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilUUID) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilUUID) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes OrderDto as json.
 func (o OptOrderDto) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1102,158 +1283,6 @@ func (s *OptOrderDto) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes OrderByUUIDBadGateway as json.
-func (s *OrderByUUIDBadGateway) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes OrderByUUIDBadGateway from json.
-func (s *OrderByUUIDBadGateway) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OrderByUUIDBadGateway to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = OrderByUUIDBadGateway(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OrderByUUIDBadGateway) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OrderByUUIDBadGateway) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OrderByUUIDBadRequest as json.
-func (s *OrderByUUIDBadRequest) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes OrderByUUIDBadRequest from json.
-func (s *OrderByUUIDBadRequest) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OrderByUUIDBadRequest to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = OrderByUUIDBadRequest(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OrderByUUIDBadRequest) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OrderByUUIDBadRequest) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OrderCancelBadGateway as json.
-func (s *OrderCancelBadGateway) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes OrderCancelBadGateway from json.
-func (s *OrderCancelBadGateway) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OrderCancelBadGateway to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = OrderCancelBadGateway(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OrderCancelBadGateway) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OrderCancelBadGateway) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OrderCancelBadRequest as json.
-func (s *OrderCancelBadRequest) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes OrderCancelBadRequest from json.
-func (s *OrderCancelBadRequest) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OrderCancelBadRequest to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = OrderCancelBadRequest(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OrderCancelBadRequest) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OrderCancelBadRequest) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
 func (s *OrderDto) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -1281,15 +1310,19 @@ func (s *OrderDto) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("total_price")
-		e.Float32(s.TotalPrice)
+		e.Float64(s.TotalPrice)
 	}
 	{
-		e.FieldStart("transaction_uuid")
-		json.EncodeUUID(e, s.TransactionUUID)
+		if s.TransactionUUID.Set {
+			e.FieldStart("transaction_uuid")
+			s.TransactionUUID.Encode(e)
+		}
 	}
 	{
-		e.FieldStart("payment_method")
-		s.PaymentMethod.Encode(e)
+		if s.PaymentMethod.Set {
+			e.FieldStart("payment_method")
+			s.PaymentMethod.Encode(e)
+		}
 	}
 	{
 		e.FieldStart("status")
@@ -1363,8 +1396,8 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 		case "total_price":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				v, err := d.Float32()
-				s.TotalPrice = float32(v)
+				v, err := d.Float64()
+				s.TotalPrice = float64(v)
 				if err != nil {
 					return err
 				}
@@ -1373,11 +1406,9 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"total_price\"")
 			}
 		case "transaction_uuid":
-			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				v, err := json.DecodeUUID(d)
-				s.TransactionUUID = v
-				if err != nil {
+				s.TransactionUUID.Reset()
+				if err := s.TransactionUUID.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1385,8 +1416,8 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"transaction_uuid\"")
 			}
 		case "payment_method":
-			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
+				s.PaymentMethod.Reset()
 				if err := s.PaymentMethod.Decode(d); err != nil {
 					return err
 				}
@@ -1414,7 +1445,7 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b01111111,
+		0b01001111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1456,82 +1487,6 @@ func (s *OrderDto) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OrderDto) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OrderPayBadGateway as json.
-func (s *OrderPayBadGateway) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes OrderPayBadGateway from json.
-func (s *OrderPayBadGateway) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OrderPayBadGateway to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = OrderPayBadGateway(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OrderPayBadGateway) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OrderPayBadGateway) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OrderPayBadRequest as json.
-func (s *OrderPayBadRequest) Encode(e *jx.Encoder) {
-	unwrapped := (*BadGatewayError)(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes OrderPayBadRequest from json.
-func (s *OrderPayBadRequest) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OrderPayBadRequest to nil")
-	}
-	var unwrapped BadGatewayError
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = OrderPayBadRequest(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *OrderPayBadRequest) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OrderPayBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

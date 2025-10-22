@@ -42,13 +42,13 @@ func request_InventoryService_GetPart_0(ctx context.Context, marshaler runtime.M
 		err      error
 	)
 	io.Copy(io.Discard, req.Body)
-	val, ok := pathParams["inventory_uuid"]
+	val, ok := pathParams["uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "inventory_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uuid")
 	}
-	protoReq.InventoryUuid, err = runtime.String(val)
+	protoReq.Uuid, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "inventory_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uuid", err)
 	}
 	msg, err := client.GetPart(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -60,13 +60,13 @@ func local_request_InventoryService_GetPart_0(ctx context.Context, marshaler run
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	val, ok := pathParams["inventory_uuid"]
+	val, ok := pathParams["uuid"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "inventory_uuid")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "uuid")
 	}
-	protoReq.InventoryUuid, err = runtime.String(val)
+	protoReq.Uuid, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "inventory_uuid", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "uuid", err)
 	}
 	msg, err := server.GetPart(ctx, &protoReq)
 	return msg, metadata, err
@@ -108,7 +108,7 @@ func RegisterInventoryServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/inventory.v1.InventoryService/GetPart", runtime.WithHTTPPathPattern("/api/v1/inventory/{inventory_uuid}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/inventory.v1.InventoryService/GetPart", runtime.WithHTTPPathPattern("/api/v1/inventory/{uuid}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -186,7 +186,7 @@ func RegisterInventoryServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/inventory.v1.InventoryService/GetPart", runtime.WithHTTPPathPattern("/api/v1/inventory/{inventory_uuid}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/inventory.v1.InventoryService/GetPart", runtime.WithHTTPPathPattern("/api/v1/inventory/{uuid}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -220,7 +220,7 @@ func RegisterInventoryServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_InventoryService_GetPart_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "inventory", "inventory_uuid"}, ""))
+	pattern_InventoryService_GetPart_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "inventory", "uuid"}, ""))
 	pattern_InventoryService_ListParts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "inventory", "list"}, ""))
 )
 

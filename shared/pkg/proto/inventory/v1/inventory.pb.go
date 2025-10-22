@@ -90,7 +90,7 @@ func (Category) EnumDescriptor() ([]byte, []int) {
 type GetPartRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// UUID идентификатор детали
-	InventoryUuid string `protobuf:"bytes,1,opt,name=inventory_uuid,json=inventoryUuid,proto3" json:"inventory_uuid,omitempty"`
+	Uuid          string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -125,9 +125,9 @@ func (*GetPartRequest) Descriptor() ([]byte, []int) {
 	return file_inventory_v1_inventory_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetPartRequest) GetInventoryUuid() string {
+func (x *GetPartRequest) GetUuid() string {
 	if x != nil {
-		return x.InventoryUuid
+		return x.Uuid
 	}
 	return ""
 }
@@ -681,7 +681,7 @@ type PartsFilter struct {
 	//Список категорий. Пусто — не фильтруем по категории
 	Categories []Category `protobuf:"varint,3,rep,packed,name=categories,proto3,enum=inventory.v1.Category" json:"categories,omitempty"`
 	//Список стран производителей. Пусто — не фильтруем по стране
-	Countries []string `protobuf:"bytes,4,rep,name=countries,proto3" json:"countries,omitempty"`
+	ManufacturerCountries []string `protobuf:"bytes,4,rep,name=manufacturer_countries,json=manufacturerCountries,proto3" json:"manufacturer_countries,omitempty"`
 	//Список тегов. Пусто — не фильтруем по тегам
 	Tags          []string `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -739,9 +739,9 @@ func (x *PartsFilter) GetCategories() []Category {
 	return nil
 }
 
-func (x *PartsFilter) GetCountries() []string {
+func (x *PartsFilter) GetManufacturerCountries() []string {
 	if x != nil {
-		return x.Countries
+		return x.ManufacturerCountries
 	}
 	return nil
 }
@@ -757,9 +757,9 @@ var File_inventory_v1_inventory_proto protoreflect.FileDescriptor
 
 const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\n" +
-	"\x1cinventory/v1/inventory.proto\x12\finventory.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/api/annotations.proto\"7\n" +
-	"\x0eGetPartRequest\x12%\n" +
-	"\x0einventory_uuid\x18\x01 \x01(\tR\rinventoryUuid\"9\n" +
+	"\x1cinventory/v1/inventory.proto\x12\finventory.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/api/annotations.proto\"$\n" +
+	"\x0eGetPartRequest\x12\x12\n" +
+	"\x04uuid\x18\x01 \x01(\tR\x04uuid\"9\n" +
 	"\x0fGetPartResponse\x12&\n" +
 	"\x04part\x18\x01 \x01(\v2\x12.inventory.v1.PartR\x04part\"E\n" +
 	"\x10ListPartsRequest\x121\n" +
@@ -804,14 +804,14 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\fdouble_value\x18\x03 \x01(\x01H\x00R\vdoubleValue\x12%\n" +
 	"\rboolean_value\x18\x04 \x01(\bH\x00R\fbooleanValueB\f\n" +
 	"\n" +
-	"value_type\"\xa3\x01\n" +
+	"value_type\"\xbc\x01\n" +
 	"\vPartsFilter\x12\x14\n" +
 	"\x05uuids\x18\x01 \x03(\tR\x05uuids\x12\x14\n" +
 	"\x05names\x18\x02 \x03(\tR\x05names\x126\n" +
 	"\n" +
 	"categories\x18\x03 \x03(\x0e2\x16.inventory.v1.CategoryR\n" +
-	"categories\x12\x1c\n" +
-	"\tcountries\x18\x04 \x03(\tR\tcountries\x12\x12\n" +
+	"categories\x125\n" +
+	"\x16manufacturer_countries\x18\x04 \x03(\tR\x15manufacturerCountries\x12\x12\n" +
 	"\x04tags\x18\x05 \x03(\tR\x04tags*Q\n" +
 	"\bCategory\x12\x17\n" +
 	"\x13UNKNOWN_UNSPECIFIED\x10\x00\x12\n" +
@@ -819,9 +819,9 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\x06ENGINE\x10\x01\x12\b\n" +
 	"\x04FUEL\x10\x02\x12\f\n" +
 	"\bPORTHOLE\x10\x03\x12\b\n" +
-	"\x04WING\x10\x042\xf7\x01\n" +
-	"\x10InventoryService\x12r\n" +
-	"\aGetPart\x12\x1c.inventory.v1.GetPartRequest\x1a\x1d.inventory.v1.GetPartResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/inventory/{inventory_uuid}\x12o\n" +
+	"\x04WING\x10\x042\xed\x01\n" +
+	"\x10InventoryService\x12h\n" +
+	"\aGetPart\x12\x1c.inventory.v1.GetPartRequest\x1a\x1d.inventory.v1.GetPartResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/inventory/{uuid}\x12o\n" +
 	"\tListParts\x12\x1e.inventory.v1.ListPartsRequest\x1a\x1f.inventory.v1.ListPartsResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/inventory/listBaZ_github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1;inventory_v1b\x06proto3"
 
 var (
