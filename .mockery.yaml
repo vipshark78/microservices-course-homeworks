@@ -1,0 +1,38 @@
+with-expecter: true
+boilerplate-file: ".mockery_boilerplate_text.txt"
+dir: "{{.InterfaceDir}}/mocks"
+filename: "mock_{{.InterfaceNameSnake}}.go"
+outpkg: "mocks"
+mockname: "{{.InterfaceName}}"
+resolve-type-alias: False
+issue-845-fix: True
+
+packages:
+  github.com/vipshark78/microservices-course-homeworks/payment/internal/service:
+    config:
+      include-regex: ".*Service"
+
+  github.com/vipshark78/microservices-course-homeworks/payment/internal/repository:
+    config:
+      include-regex: ".*Repository"
+
+
+  github.com/vipshark78/microservices-course-homeworks/inventory/internal/service:
+    config:
+      include-regex: ".*Service"
+
+  github.com/vipshark78/microservices-course-homeworks/inventory/internal/repository:
+    config:
+      include-regex: ".*Repository"
+
+  github.com/vipshark78/microservices-course-homeworks/order/internal/service:
+    config:
+      include-regex: ".*Service"
+
+  github.com/vipshark78/microservices-course-homeworks/order/internal/repository:
+    config:
+      include-regex: ".*Repository"
+
+  github.com/vipshark78/microservices-course-homeworks/order/internal/client/grpc:
+    config:
+      include-regex: ".*Client"
