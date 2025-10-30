@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
@@ -9,11 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	api "github.com/vipshark78/microservices-course-homeworks/payment/internal/api/payment/v1"
 	"github.com/vipshark78/microservices-course-homeworks/payment/internal/interceptor"
+	service "github.com/vipshark78/microservices-course-homeworks/payment/internal/service/payment"
 	payment_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/payment/v1"
 )
 
@@ -26,8 +26,8 @@ func main() {
 		return
 	}
 	defer func() {
-		if cerr := lis.Close(); cerr != nil {
-			log.Printf("failed to close listener: %v\n", cerr)
+		if err := lis.Close(); err != nil {
+			log.Printf("failed to close listener: %v\n", err)
 		}
 	}()
 
@@ -39,9 +39,9 @@ func main() {
 	)
 
 	// Регистрируем наш сервис
-	service := newPaymentService()
-
-	payment_v1.RegisterPaymentServiceServer(s, service)
+	paymentService := service.NewPaymentService()
+	api := api.NewApi(paymentService)
+	payment_v1.RegisterPaymentServiceServer(s, api)
 
 	// Включаем рефлексию для отладки
 	reflection.Register(s)
@@ -62,24 +62,4 @@ func main() {
 	log.Println("🛑 Shutting down gRPC server...")
 	s.GracefulStop()
 	log.Println("✅ Server stopped")
-}
-
-// PaymentService сервис для обработки платежей.
-type PaymentService struct {
-	payment_v1.UnimplementedPaymentServiceServer
-}
-
-// newPaymentService создает новый экземпляр PaymentService.
-func newPaymentService() *PaymentService {
-	return &PaymentService{}
-}
-
-// PayOrder Обрабатывает оплату и возвращает transaction_uuid
-func (p *PaymentService) PayOrder(ctx context.Context, req *payment_v1.PayOrderRequest) (*payment_v1.PayOrderResponse, error) {
-	transactionUUID := uuid.NewString()
-	log.Printf("Оплата прошла успешно, transaction_uuid: %s\n", transactionUUID)
-
-	return &payment_v1.PayOrderResponse{
-		TransactionUuid: transactionUUID,
-	}, nil
 }
