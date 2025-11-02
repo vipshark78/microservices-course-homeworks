@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/google/uuid"
 
@@ -12,17 +13,17 @@ import (
 // CreateOrder реализует обработку запроса создания заказа.
 func (a *api) CreateOrder(ctx context.Context, req *order_v1.CreateOrderRequest) (order_v1.CreateOrderRes, error) {
 	if err := a.validateCreateOrderRequest(req); err != nil {
-		return &order_v1.BadRequestError{Code: 400, Message: "Bad Request"}, err
+		return &order_v1.BadRequestError{Code: http.StatusBadRequest, Message: "Bad Request"}, err
 	}
 
 	reqUuids, err := a.convertUUIDToSliceString(req.PartUuids)
 	if err != nil {
-		return &order_v1.BadRequestError{Code: 400, Message: "Bad Request"}, err
+		return &order_v1.BadRequestError{Code: http.StatusBadRequest, Message: "Bad Request"}, err
 	}
 
 	order, err := a.orderService.CreateOrder(ctx, req.UserUUID.String(), reqUuids)
 	if err != nil {
-		return &order_v1.InternalServerError{Code: 500, Message: "Internal Server Error"}, err
+		return &order_v1.InternalServerError{Code: http.StatusInternalServerError, Message: "Internal Server Error"}, err
 	}
 	return &order_v1.CreateOrderResponse{OrderUUID: uuid.MustParse(order.OrderUUID), TotalPrice: order.TotalPrice}, nil
 }

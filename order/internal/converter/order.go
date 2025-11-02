@@ -4,7 +4,6 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
-	repomodel "github.com/vipshark78/microservices-course-homeworks/order/internal/repository/model"
 	order_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/openapi/order/v1"
 )
 
@@ -32,57 +31,61 @@ func ConvertModelToPartsUUIDs(modelPartsUUIDs []string) []uuid.UUID {
 }
 
 // ConvertModelToOrderStatus конвертирует статус заказа из модели бизнес-логики в модель DTO.
-func ConvertModelToOrderStatus(modelStatus string) order_v1.OrderStatus {
+func ConvertModelToOrderStatus(modelStatus model.OrderStatus) order_v1.OrderStatus {
 	switch modelStatus {
-	case repomodel.OrderStatusPENDINGPAYMENT:
+	case model.OrderStatusPENDINGPAYMENT:
 		return order_v1.OrderStatusPENDINGPAYMENT
-	case repomodel.OrderStatusPAID:
+	case model.OrderStatusPAID:
 		return order_v1.OrderStatusPAID
-	case repomodel.OrderStatusCANCELLED:
+	case model.OrderStatusCANCELLED:
 		return order_v1.OrderStatusCANCELLED
 	}
 	return order_v1.OrderStatusPENDINGPAYMENT
 }
 
 // ConvertModelToPaymentMethod конвертирует метод оплаты из модели бизнес-логики в модель DTO.
-func ConvertModelToPaymentMethod(modelPaymentMethod string) order_v1.OptNilPaymentMethod {
-	switch modelPaymentMethod {
-	case repomodel.PaymentMethodSBP:
+func ConvertModelToPaymentMethod(modelPaymentMethod *model.PaymentMethod) order_v1.OptNilPaymentMethod {
+	if modelPaymentMethod == nil {
+		return order_v1.NewOptNilPaymentMethod(order_v1.PaymentMethodUNKNOWN)
+	}
+
+	switch *modelPaymentMethod {
+	case model.PaymentMethodSBP:
 		return order_v1.NewOptNilPaymentMethod(order_v1.PaymentMethodSBP)
-	case repomodel.PaymentMethodCARD:
+	case model.PaymentMethodCARD:
 		return order_v1.NewOptNilPaymentMethod(order_v1.PaymentMethodCARD)
-	case repomodel.PaymentMethodCREDITCARD:
+	case model.PaymentMethodCREDITCARD:
 		return order_v1.NewOptNilPaymentMethod(order_v1.PaymentMethodCREDITCARD)
-	case repomodel.PaymentMethodINVESTORMONEY:
+	case model.PaymentMethodINVESTORMONEY:
 		return order_v1.NewOptNilPaymentMethod(order_v1.PaymentMethodINVESTORMONEY)
 	}
 	return order_v1.NewOptNilPaymentMethod(order_v1.PaymentMethodUNKNOWN)
 }
 
 // ConvertModelToOptNilUUID конвертирует transactionUUID из модели DTO в модель бизнес-логики.
-func ConvertPaymentMethodToModel(paymentMethod order_v1.NilPaymentMethod) string {
+func ConvertPaymentMethodToModel(paymentMethod order_v1.NilPaymentMethod) model.PaymentMethod {
 	if paymentMethod.Null {
-		return repomodel.PaymentMethodUNKNOWN
+		return model.PaymentMethodUNKNOWN
 	}
 	switch paymentMethod.Value {
 	case order_v1.PaymentMethodSBP:
-		return repomodel.PaymentMethodSBP
+		return model.PaymentMethodSBP
 	case order_v1.PaymentMethodCARD:
-		return repomodel.PaymentMethodCARD
+		return model.PaymentMethodCARD
 	case order_v1.PaymentMethodCREDITCARD:
-		return repomodel.PaymentMethodCREDITCARD
+		return model.PaymentMethodCREDITCARD
 	case order_v1.PaymentMethodINVESTORMONEY:
-		return repomodel.PaymentMethodINVESTORMONEY
+		return model.PaymentMethodINVESTORMONEY
 	default:
-		return repomodel.PaymentMethodUNKNOWN
+		return model.PaymentMethodUNKNOWN
 	}
 }
 
 // ConvertModelToOptNilUUID конвертирует transactionUUID из модели бизнес-логики в модель DTO.
-func ConvertModelToOptNilUUID(modelTransactionUUID string) order_v1.OptNilUUID {
-	if modelTransactionUUID == "" {
+func ConvertModelToOptNilUUID(modelTransactionUUID *string) order_v1.OptNilUUID {
+	if modelTransactionUUID == nil {
 		return order_v1.NewOptNilUUID(uuid.Nil)
 	} else {
-		return order_v1.NewOptNilUUID(uuid.MustParse(modelTransactionUUID))
+		return order_v1.NewOptNilUUID(uuid.MustParse(*modelTransactionUUID))
 	}
 }

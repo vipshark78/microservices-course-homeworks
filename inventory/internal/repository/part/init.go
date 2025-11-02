@@ -1,7 +1,9 @@
 package part
 
 import (
+	"context"
 	"math"
+	"math/rand/v2"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
@@ -11,12 +13,15 @@ import (
 )
 
 // initParts инициализирует репозиторий случайными данными.
-func (r *repository) initParts() {
+func (r *repository) Init(ctx context.Context) error {
 	parts := generateParts()
-
 	for _, part := range parts {
-		r.parts[part.UUID] = part
+		err := r.InsertPart(ctx, part)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // generateParts генерирует список случайных данных для заполнения репозитория.
@@ -58,7 +63,7 @@ func generateParts() []model.Part {
 			Description:   descriptions[idx],
 			Price:         roundTo(gofakeit.Float64Range(100, 10_000)),
 			StockQuantity: int64(gofakeit.Number(1, 100)),
-			Category:      gofakeit.RandomString([]string{model.FUEL, model.WING, model.ENGINE, model.PORTHOLE}),
+			Category:      randomCategory(),
 			Dimensions:    generateDimensions(),
 			Manufacturer:  generateManufacturer(),
 			Tags:          generateTags(),
@@ -69,6 +74,12 @@ func generateParts() []model.Part {
 	}
 
 	return parts
+}
+
+// randomCategory возвращает случайную категорию
+func randomCategory() model.Category {
+	categories := []model.Category{model.FUEL, model.ENGINE, model.WING, model.ENGINE, model.PORTHOLE}
+	return categories[rand.IntN(len(categories))] // nolint:gosec
 }
 
 // generateDimensions генерирует случайные размеры.
@@ -101,8 +112,8 @@ func generateTags() []string {
 }
 
 // generateMetadata генерирует случайное количество метаданных.
-func generateMetadata() map[string]*model.Value {
-	metadata := make(map[string]*model.Value)
+func generateMetadata() map[string]model.Value {
+	metadata := make(map[string]model.Value)
 
 	for i := 0; i < gofakeit.Number(1, 10); i++ {
 		metadata[gofakeit.Word()] = generateMetadataValue()
@@ -112,31 +123,29 @@ func generateMetadata() map[string]*model.Value {
 }
 
 // generateMetadataValue генерирует случайное значение метаданных.
-func generateMetadataValue() *model.Value {
+func generateMetadataValue() model.Value {
 	switch gofakeit.Number(0, 3) {
 	case 0:
-		return &model.Value{
+		return model.Value{
 			StringValue: lo.ToPtr(gofakeit.Word()),
 		}
 
 	case 1:
-		return &model.Value{
+		return model.Value{
 			Int64Value: lo.ToPtr(int64(gofakeit.Number(1, 100))),
 		}
 
 	case 2:
-		return &model.Value{
+		return model.Value{
 			DoubleValue: lo.ToPtr(gofakeit.Float64Range(1, 100)),
 		}
 
 	case 3:
-		return &model.Value{
+		return model.Value{
 			BooleanValue: lo.ToPtr(gofakeit.Bool()),
 		}
-
-	default:
-		return nil
 	}
+	return model.Value{}
 }
 
 // roundTo округляет число до двух знаков после запятой.

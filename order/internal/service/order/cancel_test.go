@@ -2,6 +2,7 @@ package order
 
 import (
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
 )
@@ -14,8 +15,8 @@ func (s *ServiceSuite) TestOrderCancelSuccess() {
 			UserUUID:        reqUUID.String(),
 			PartUuids:       []string{reqUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: reqUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(reqUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPENDINGPAYMENT,
 		}
 	)
@@ -23,7 +24,7 @@ func (s *ServiceSuite) TestOrderCancelSuccess() {
 	s.repository.On("Read", s.ctx, reqUUID.String()).Return(order, nil).Once()
 	orderCancelled := order
 	orderCancelled.Status = model.OrderStatusCANCELLED
-	s.repository.On("Update", orderCancelled).Return(nil).Once()
+	s.repository.On("Update", s.ctx, orderCancelled).Return(nil).Once()
 
 	err := s.service.OrderCancel(s.ctx, reqUUID.String())
 
@@ -49,8 +50,8 @@ func (s *ServiceSuite) TestOrderCancelErrorOrderCancelled() {
 			UserUUID:        reqUUID.String(),
 			PartUuids:       []string{reqUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: reqUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(reqUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusCANCELLED,
 		}
 	)
@@ -71,8 +72,8 @@ func (s *ServiceSuite) TestOrderCancelErrorOrderPaid() {
 			UserUUID:        reqUUID.String(),
 			PartUuids:       []string{reqUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: reqUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(reqUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPAID,
 		}
 	)
@@ -93,8 +94,8 @@ func (s *ServiceSuite) TestOrderCancelUpdateError() {
 			UserUUID:        reqUUID.String(),
 			PartUuids:       []string{reqUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: reqUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(reqUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPENDINGPAYMENT,
 		}
 	)
@@ -104,7 +105,7 @@ func (s *ServiceSuite) TestOrderCancelUpdateError() {
 	orderCancelled := order
 	orderCancelled.Status = model.OrderStatusCANCELLED
 
-	s.repository.On("Update", orderCancelled).Return(model.ErrOrderNotFound).Once()
+	s.repository.On("Update", s.ctx, orderCancelled).Return(model.ErrOrderNotFound).Once()
 
 	err := s.service.OrderCancel(s.ctx, reqUUID.String())
 

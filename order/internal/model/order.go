@@ -5,9 +5,9 @@ type Order struct {
 	UserUUID        string
 	PartUuids       []string
 	TotalPrice      float64
-	TransactionUUID string
-	PaymentMethod   string
-	Status          string
+	TransactionUUID *string
+	PaymentMethod   *PaymentMethod
+	Status          OrderStatus
 }
 
 type CreateOrder struct {
@@ -18,19 +18,23 @@ type CreateOrder struct {
 type PayOrder struct {
 	OrderUUID     string
 	UserUUID      string
-	PaymentMethod string
+	PaymentMethod PaymentMethod
 }
 
+type OrderStatus string
+
+type PaymentMethod string
+
 const (
-	OrderStatusPENDINGPAYMENT = "PENDING_PAYMENT"
-	OrderStatusPAID           = "PAID"
-	OrderStatusCANCELLED      = "CANCELLED"
+	OrderStatusPENDINGPAYMENT OrderStatus = "PENDING_PAYMENT"
+	OrderStatusPAID           OrderStatus = "PAID"
+	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
 )
 
 const (
-	PaymentMethodUNKNOWN       = "UNKNOWN"
-	PaymentMethodCARD          = "CARD"
-	PaymentMethodSBP           = "SBP"
-	PaymentMethodCREDITCARD    = "CREDIT_CARD"
-	PaymentMethodINVESTORMONEY = "INVESTOR_MONEY"
+	PaymentMethodUNKNOWN       PaymentMethod = "UNKNOWN"
+	PaymentMethodCARD          PaymentMethod = "CARD"
+	PaymentMethodSBP           PaymentMethod = "SBP"
+	PaymentMethodCREDITCARD    PaymentMethod = "CREDIT_CARD"
+	PaymentMethodINVESTORMONEY PaymentMethod = "INVESTOR_MONEY"
 )

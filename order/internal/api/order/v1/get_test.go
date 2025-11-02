@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/converter"
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
@@ -25,8 +26,8 @@ func (s *APISuite) TestOrderByUUIDSuccess() {
 			UserUUID:        userUUID.String(),
 			PartUuids:       partUUIDs,
 			TotalPrice:      totalPrice,
-			TransactionUUID: transactionUUID.String(),
-			PaymentMethod:   paymentMethod,
+			TransactionUUID: lo.ToPtr(transactionUUID.String()),
+			PaymentMethod:   lo.ToPtr(paymentMethod),
 			Status:          status,
 		}
 	)

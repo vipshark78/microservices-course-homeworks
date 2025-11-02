@@ -141,17 +141,17 @@ func (_c *OrderRepository_Read_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
-// Update provides a mock function with given fields: order
-func (_m *OrderRepository) Update(order model.Order) error {
-	ret := _m.Called(order)
+// Update provides a mock function with given fields: ctx, order
+func (_m *OrderRepository) Update(ctx context.Context, order model.Order) error {
+	ret := _m.Called(ctx, order)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(model.Order) error); ok {
-		r0 = rf(order)
+	if rf, ok := ret.Get(0).(func(context.Context, model.Order) error); ok {
+		r0 = rf(ctx, order)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -165,14 +165,15 @@ type OrderRepository_Update_Call struct {
 }
 
 // Update is a helper method to define mock.On call
+//   - ctx context.Context
 //   - order model.Order
-func (_e *OrderRepository_Expecter) Update(order interface{}) *OrderRepository_Update_Call {
-	return &OrderRepository_Update_Call{Call: _e.mock.On("Update", order)}
+func (_e *OrderRepository_Expecter) Update(ctx interface{}, order interface{}) *OrderRepository_Update_Call {
+	return &OrderRepository_Update_Call{Call: _e.mock.On("Update", ctx, order)}
 }
 
-func (_c *OrderRepository_Update_Call) Run(run func(order model.Order)) *OrderRepository_Update_Call {
+func (_c *OrderRepository_Update_Call) Run(run func(ctx context.Context, order model.Order)) *OrderRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(model.Order))
+		run(args[0].(context.Context), args[1].(model.Order))
 	})
 	return _c
 }
@@ -182,7 +183,7 @@ func (_c *OrderRepository_Update_Call) Return(_a0 error) *OrderRepository_Update
 	return _c
 }
 
-func (_c *OrderRepository_Update_Call) RunAndReturn(run func(model.Order) error) *OrderRepository_Update_Call {
+func (_c *OrderRepository_Update_Call) RunAndReturn(run func(context.Context, model.Order) error) *OrderRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

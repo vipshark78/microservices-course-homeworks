@@ -36,7 +36,7 @@ vars:
   COVERAGE_DIR: '{{.ROOT_DIR}}/coverage'
   COVERAGE_FILE: total.out                                      
 
-  MODULES: assembly inventory order payment platform iam notification
+  MODULES: inventory order payment
 
 tasks:
   install-formatters:
@@ -272,6 +272,42 @@ tasks:
       - |
         echo "🧪 Тестирование API микросервисов через gRPC и REST"
         
+        # ⏳ Убедимся, что Order Service готов
+        echo "⏳ Ожидание готовности Order Service..."
+        for i in {1..60}; do
+          # Проверяем конкретный API endpoint вместо просто здоровья
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "http://localhost:8080/api/v1/orders" \
+            -H "Content-Type: application/json" \
+            -d '{"user_uuid":"test","part_uuids":["test"]}' 2>/dev/null)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+        
+          # Если получаем любой ответ (не Connection refused), значит API готов
+          if [ "$HTTP_CODE" != "" ] && [ "$HTTP_CODE" != "000" ]; then
+            echo "✅ Order Service API готов (HTTP $HTTP_CODE)"
+            sleep 2  # Даем еще немного времени для инициализации
+            break
+          fi
+        
+          if [ $i -eq 60 ]; then
+            echo "❌ Order Service API не готов после 60 попыток"
+            exit 1
+          fi
+          sleep 1
+        done
+        
+        echo "⏳ Ожидание готовности Inventory Service..."
+        for i in {1..30}; do
+          if {{.GRPCURL}} -plaintext localhost:50051 list > /dev/null 2>&1; then
+            echo "✅ Inventory Service готов"
+            break
+          fi
+          if [ $i -eq 30 ]; then
+            echo "❌ Inventory Service не готов"
+            exit 1
+          fi
+          sleep 1
+        done
+        
         echo "📦 Тест 1: Получение списка деталей из Inventory"
         PARTS_RESPONSE=$({{.GRPCURL}} -plaintext -d '{"filter":{}}' localhost:50051 inventory.v1.InventoryService/ListParts)
         
@@ -459,7 +495,6 @@ tasks:
         echo
         echo "🎉 Все тесты API успешно выполнены!"
 
-
   mockery:install:
     desc: "Устанавливает mockery в ./bin"
     cmds:
@@ -567,3 +602,59 @@ tasks:
           fi
         done
         exit $ERR
+
+  up-core:
+    desc: Поднять core контейнеры
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🚀 Поднимаем core контейнеры"
+      - docker compose up --build --detach
+
+  down-core:
+    desc: Остановить и удалить core контейнеры
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🛑 Останавливаем core контейнеры"
+      - docker compose down --volumes
+
+  up-inventory:
+    desc: Поднять inventory сервис и все его зависимости
+    dir: deploy/compose/inventory
+    cmds:
+      - echo "[task] 📦 Поднимаем inventory сервис с зависимостями"
+      - docker compose up --build --detach
+
+  down-inventory:
+    desc: Остановить и удалить inventory сервис и все его зависимости
+    dir: deploy/compose/inventory
+    cmds:
+      - echo "[task] 🛑 Останавливаем inventory сервис с зависимостями"
+      - docker compose down --volumes
+
+  up-order:
+    desc: Поднять order сервис и все его зависимости
+    dir: deploy/compose/order
+    cmds:
+      - echo "[task] 📦 Поднимаем order сервис с зависимостями"
+      - docker compose up --build --detach
+
+  down-order:
+    desc: Остановить и удалить order сервис и все его зависимости
+    dir: deploy/compose/order
+    cmds:
+      - echo "[task] 🛑 Останавливаем order сервис с зависимостями"
+      - docker compose down --volumes
+
+  up-all:
+    desc: Поднять все сервисы по очереди вместе с зависимостями
+    cmds:
+      - task up-core
+      - task up-inventory
+      - task up-order
+
+  down-all:
+    desc: Остановить и удалить все сервисы по очереди вместе с зависимостями
+    cmds:
+      - task down-core
+      - task down-inventory
+      - task down-order

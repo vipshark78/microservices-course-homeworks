@@ -15,7 +15,7 @@ func ModelPayOrderToProtoPayOrder(payOrder model.PayOrder) *payment_v1.PayOrderR
 }
 
 // modelPaymentMethodToProtoPaymentMethod конвертирует метод оплаты из модели в прото-модель.
-func modelPaymentMethodToProtoPaymentMethod(paymentMethod string) payment_v1.PaymentMethod {
+func modelPaymentMethodToProtoPaymentMethod(paymentMethod model.PaymentMethod) payment_v1.PaymentMethod {
 	switch paymentMethod {
 	case model.PaymentMethodCREDITCARD:
 		return payment_v1.PaymentMethod_CARD

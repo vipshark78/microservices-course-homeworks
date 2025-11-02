@@ -5,11 +5,10 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/samber/lo"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/vipshark78/microservices-course-homeworks/inventory/internal/converter"
 	"github.com/vipshark78/microservices-course-homeworks/inventory/internal/model"
+	business_errors "github.com/vipshark78/microservices-course-homeworks/shared/pkg/errors"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
 )
 
@@ -28,7 +27,7 @@ func (s *APISuite) TestListPartsSuccess() {
 				Description:   gofakeit.Word(),
 				Price:         gofakeit.Float64Range(1, 1000),
 				StockQuantity: int64(gofakeit.Number(1, 100)),
-				Category:      gofakeit.Word(),
+				Category:      model.Category(gofakeit.Word()),
 				Dimensions: &model.Dimensions{
 					Length: gofakeit.Float64Range(10, 100),
 					Width:  gofakeit.Float64Range(10, 100),
@@ -41,7 +40,7 @@ func (s *APISuite) TestListPartsSuccess() {
 					Website: gofakeit.URL(),
 				},
 				Tags: []string{gofakeit.EmojiTag(), gofakeit.EmojiTag(), gofakeit.EmojiTag()},
-				Metadata: map[string]*model.Value{
+				Metadata: map[string]model.Value{
 					gofakeit.Word(): {StringValue: lo.ToPtr(gofakeit.Word())},
 					gofakeit.Word(): {Int64Value: lo.ToPtr(int64(gofakeit.Number(1, 9)))},
 					gofakeit.Word(): {BooleanValue: lo.ToPtr(gofakeit.Bool())},
@@ -56,7 +55,7 @@ func (s *APISuite) TestListPartsSuccess() {
 				Description:   gofakeit.Word(),
 				Price:         gofakeit.Float64Range(1, 1000),
 				StockQuantity: int64(gofakeit.Number(1, 100)),
-				Category:      gofakeit.Word(),
+				Category:      model.Category(gofakeit.Word()),
 				Dimensions: &model.Dimensions{
 					Length: gofakeit.Float64Range(10, 100),
 					Width:  gofakeit.Float64Range(10, 100),
@@ -69,7 +68,7 @@ func (s *APISuite) TestListPartsSuccess() {
 					Website: gofakeit.URL(),
 				},
 				Tags: []string{gofakeit.EmojiTag(), gofakeit.EmojiTag(), gofakeit.EmojiTag()},
-				Metadata: map[string]*model.Value{
+				Metadata: map[string]model.Value{
 					gofakeit.Word(): {StringValue: lo.ToPtr(gofakeit.Word())},
 					gofakeit.Word(): {Int64Value: lo.ToPtr(int64(gofakeit.Number(1, 9)))},
 					gofakeit.Word(): {BooleanValue: lo.ToPtr(gofakeit.Bool())},
@@ -95,7 +94,8 @@ func (s *APISuite) TestListPartBadRequestError() {
 
 	s.Require().Error(err)
 	s.Nil(resp)
-	s.Equal(codes.InvalidArgument, status.Code(err))
+	businessErrors := business_errors.GetBusinessError(err)
+	s.Equal(businessErrors.Code(), business_errors.InvalidArgumentErrCode)
 }
 
 func (s *APISuite) TestListPartsNotFoundError() {
@@ -111,7 +111,8 @@ func (s *APISuite) TestListPartsNotFoundError() {
 	resp, err := s.api.ListParts(s.ctx, req)
 	s.Require().Error(err)
 	s.Nil(resp)
-	s.Equal(codes.NotFound, status.Code(err))
+	businessErrors := business_errors.GetBusinessError(err)
+	s.Equal(businessErrors.Code(), business_errors.NotFoundErrCode)
 }
 
 func (s *APISuite) TestListPartsInternalError() {
@@ -131,5 +132,6 @@ func (s *APISuite) TestListPartsInternalError() {
 
 	s.Require().Error(err)
 	s.Nil(resp)
-	s.Equal(codes.Internal, status.Code(err))
+	businessErrors := business_errors.GetBusinessError(err)
+	s.Nil(businessErrors)
 }

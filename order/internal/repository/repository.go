@@ -9,5 +9,5 @@ import (
 type OrderRepository interface {
 	Insert(ctx context.Context, userUuid string, partUuids []string, price float64) (model.Order, error)
 	Read(ctx context.Context, uuid string) (model.Order, error)
-	Update(order model.Order) error
+	Update(ctx context.Context, order model.Order) error
 }

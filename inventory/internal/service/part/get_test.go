@@ -12,8 +12,8 @@ func (s *ServiceSuite) TestGetPartSuccess() {
 		order   = model.Part{UUID: reqUUID.String()}
 	)
 
-	s.repository.On("GetPart", s.ctx, reqUUID.String()).Return(order, nil)
-	resp, err := s.service.GetPart(s.ctx, reqUUID.String())
+	s.repository.On("GetPart", s.ctx, reqUUID).Return(order, nil)
+	resp, err := s.service.GetPart(s.ctx, reqUUID)
 
 	s.NoError(err)
 	s.Equal(order, resp)
@@ -22,8 +22,8 @@ func (s *ServiceSuite) TestGetPartSuccess() {
 func (s *ServiceSuite) TestGetPartNotFoundError() {
 	reqUUID := uuid.New()
 
-	s.repository.On("GetPart", s.ctx, reqUUID.String()).Return(model.Part{}, model.ErrPartNotFound)
-	resp, err := s.service.GetPart(s.ctx, reqUUID.String())
+	s.repository.On("GetPart", s.ctx, reqUUID).Return(model.Part{}, model.ErrPartNotFound)
+	resp, err := s.service.GetPart(s.ctx, reqUUID)
 
 	s.Error(err)
 	s.ErrorIs(err, model.ErrPartNotFound)

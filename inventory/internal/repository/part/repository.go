@@ -1,23 +1,17 @@
 package part
 
 import (
-	"sync"
-
-	repoModel "github.com/vipshark78/microservices-course-homeworks/inventory/internal/repository/model"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type repository struct {
-	mu    sync.RWMutex
-	parts map[string]repoModel.Part
+	db *mongo.Database
 }
 
-func NewRepository() *repository {
+func NewRepository(db *mongo.Database) *repository {
 	repo := &repository{
-		mu:    sync.RWMutex{},
-		parts: make(map[string]repoModel.Part),
+		db: db,
 	}
-
-	repo.initParts()
 
 	return repo
 }

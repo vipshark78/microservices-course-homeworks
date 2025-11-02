@@ -188,7 +188,7 @@ func (_c *OrderService_OrderCancel_Call) RunAndReturn(run func(context.Context, 
 }
 
 // OrderPay provides a mock function with given fields: ctx, orderUuid, paymentMethod
-func (_m *OrderService) OrderPay(ctx context.Context, orderUuid string, paymentMethod string) (string, error) {
+func (_m *OrderService) OrderPay(ctx context.Context, orderUuid string, paymentMethod model.PaymentMethod) (string, error) {
 	ret := _m.Called(ctx, orderUuid, paymentMethod)
 
 	if len(ret) == 0 {
@@ -197,16 +197,16 @@ func (_m *OrderService) OrderPay(ctx context.Context, orderUuid string, paymentM
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, model.PaymentMethod) (string, error)); ok {
 		return rf(ctx, orderUuid, paymentMethod)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, model.PaymentMethod) string); ok {
 		r0 = rf(ctx, orderUuid, paymentMethod)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, model.PaymentMethod) error); ok {
 		r1 = rf(ctx, orderUuid, paymentMethod)
 	} else {
 		r1 = ret.Error(1)
@@ -223,14 +223,14 @@ type OrderService_OrderPay_Call struct {
 // OrderPay is a helper method to define mock.On call
 //   - ctx context.Context
 //   - orderUuid string
-//   - paymentMethod string
+//   - paymentMethod model.PaymentMethod
 func (_e *OrderService_Expecter) OrderPay(ctx interface{}, orderUuid interface{}, paymentMethod interface{}) *OrderService_OrderPay_Call {
 	return &OrderService_OrderPay_Call{Call: _e.mock.On("OrderPay", ctx, orderUuid, paymentMethod)}
 }
 
-func (_c *OrderService_OrderPay_Call) Run(run func(ctx context.Context, orderUuid string, paymentMethod string)) *OrderService_OrderPay_Call {
+func (_c *OrderService_OrderPay_Call) Run(run func(ctx context.Context, orderUuid string, paymentMethod model.PaymentMethod)) *OrderService_OrderPay_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
+		run(args[0].(context.Context), args[1].(string), args[2].(model.PaymentMethod))
 	})
 	return _c
 }
@@ -240,7 +240,7 @@ func (_c *OrderService_OrderPay_Call) Return(_a0 string, _a1 error) *OrderServic
 	return _c
 }
 
-func (_c *OrderService_OrderPay_Call) RunAndReturn(run func(context.Context, string, string) (string, error)) *OrderService_OrderPay_Call {
+func (_c *OrderService_OrderPay_Call) RunAndReturn(run func(context.Context, string, model.PaymentMethod) (string, error)) *OrderService_OrderPay_Call {
 	_c.Call.Return(run)
 	return _c
 }

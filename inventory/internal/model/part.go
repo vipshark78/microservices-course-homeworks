@@ -10,14 +10,23 @@ type Part struct {
 	Description   string
 	Price         float64
 	StockQuantity int64
-	Category      string
+	Category      Category
 	Dimensions    *Dimensions
 	Manufacturer  *Manufacturer
 	Tags          []string
-	Metadata      map[string]*Value
+	Metadata      map[string]Value
 	CreatedAt     *time.Time
 	UpdatedAt     *time.Time
 }
+
+type Category string
+
+const (
+	ENGINE   Category = "ENGINE"
+	FUEL     Category = "FUEL"
+	PORTHOLE Category = "PORTHOLE"
+	WING     Category = "WING"
+)
 
 type Dimensions struct {
 	Length float64
