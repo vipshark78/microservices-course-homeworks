@@ -2,7 +2,10 @@ package order
 
 import (
 	"context"
+	"fmt"
+	"log"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
@@ -11,19 +14,44 @@ import (
 )
 
 func (r *repository) Insert(ctx context.Context, userUuid string, partUuids []string, price float64) (model.Order, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	orderUUID := uuid.New()
+	builderInsert := sq.
+		Insert(repomodel.TableName).
+		PlaceholderFormat(sq.Dollar).
+		Columns(
+			repomodel.ColumnUserUUID,
+			repomodel.ColumnPartUuids,
+			repomodel.ColumnTotalPrice,
+			repomodel.ColumnStatus,
+		).
+		Values(
+			userUuid,
+			partUuids,
+			price,
+			model.OrderStatusPENDINGPAYMENT,
+		).
+		Suffix(fmt.Sprintf("RETURNING %s", repomodel.ColumnOrderUUID))
+
+	query, args, err := builderInsert.ToSql()
+	if err != nil {
+		log.Printf("failed to build query: %v\n", err)
+		return model.Order{}, err
+	}
+
+	var orderUUID uuid.UUID
+	err = r.pool.QueryRow(ctx, query, args...).Scan(&orderUUID)
+	if err != nil {
+		log.Printf("failed to insert order: %v\n", err)
+		return model.Order{}, err
+	}
+
 	newOrder := repomodel.Order{
 		UserUUID:        userUuid,
 		OrderUUID:       orderUUID.String(),
 		PartUuids:       partUuids,
 		TotalPrice:      price,
-		TransactionUUID: "",
-		PaymentMethod:   "",
-		Status:          model.OrderStatusPENDINGPAYMENT,
+		TransactionUUID: nil,
+		PaymentMethod:   nil,
+		Status:          repomodel.OrderStatusPENDINGPAYMENT,
 	}
-
-	r.orders[orderUUID.String()] = newOrder
 	return converter.ModelToOrder(newOrder), nil
 }

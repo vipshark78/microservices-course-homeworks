@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/google/uuid"
 
@@ -13,12 +14,12 @@ import (
 // OrderPay реализует обработку запроса на оплату заказа.
 func (a *api) OrderPay(ctx context.Context, req *order_v1.PayOrderRequest, params order_v1.OrderPayParams) (order_v1.OrderPayRes, error) {
 	if err := a.validateOrderPayRequest(req, params); err != nil {
-		return &order_v1.BadRequestError{Code: 400, Message: "Bad Request"}, err
+		return &order_v1.BadRequestError{Code: http.StatusBadRequest, Message: "Bad Request"}, err
 	}
 
 	id, err := a.orderService.OrderPay(ctx, params.OrderUUID.String(), converter.ConvertPaymentMethodToModel(req.PaymentMethod))
 	if err != nil {
-		return &order_v1.NotFoundError{Code: 404, Message: "Order Not Found"}, nil
+		return &order_v1.NotFoundError{Code: http.StatusNotFound, Message: "Order Not Found"}, nil
 	}
 	return &order_v1.PayOrderResponse{TransactionUUID: uuid.MustParse(id)}, nil
 }

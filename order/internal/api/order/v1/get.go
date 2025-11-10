@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/google/uuid"
 
@@ -12,12 +13,12 @@ import (
 // OrderByUUID реализует получение заказа по UUID.
 func (a *api) OrderByUUID(ctx context.Context, params order_v1.OrderByUUIDParams) (order_v1.OrderByUUIDRes, error) {
 	if err := uuid.Validate(params.OrderUUID.String()); err != nil {
-		return &order_v1.BadRequestError{Code: 400, Message: "Bad Request"}, err
+		return &order_v1.BadRequestError{Code: http.StatusBadRequest, Message: "Bad Request"}, err
 	}
 
 	order, err := a.orderService.OrderByUUID(ctx, params.OrderUUID.String())
 	if err != nil {
-		return &order_v1.NotFoundError{Code: 404, Message: "Order Not Found"}, nil
+		return &order_v1.NotFoundError{Code: http.StatusNotFound, Message: "Order Not Found"}, nil
 	}
 
 	return &order_v1.GetOrderResponse{AllOf: order_v1.NewOptOrderDto(converter.ConvertModelToOrder(order))}, nil

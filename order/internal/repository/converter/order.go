@@ -10,12 +10,28 @@ func ModelToOrder(order repomodel.Order) model.Order {
 	return model.Order{
 		OrderUUID:       order.OrderUUID,
 		UserUUID:        order.UserUUID,
-		Status:          order.Status,
+		Status:          model.OrderStatus(order.Status),
 		PartUuids:       order.PartUuids,
 		TotalPrice:      order.TotalPrice,
 		TransactionUUID: order.TransactionUUID,
-		PaymentMethod:   order.PaymentMethod,
+		PaymentMethod:   ModelToPaymentMethod(order.PaymentMethod),
 	}
+}
+
+func PaymentMethodToModel(paymentMethod *model.PaymentMethod) *repomodel.PaymentMethod {
+	if paymentMethod == nil {
+		return nil
+	}
+	pm := repomodel.PaymentMethod(*paymentMethod)
+	return &pm
+}
+
+func ModelToPaymentMethod(paymentMethod *repomodel.PaymentMethod) *model.PaymentMethod {
+	if paymentMethod == nil {
+		return nil
+	}
+	pm := model.PaymentMethod(*paymentMethod)
+	return &pm
 }
 
 // OrderToModel конвертирует модель бизнес-логики в модель репозитория.
@@ -23,10 +39,10 @@ func OrderToModel(order model.Order) repomodel.Order {
 	return repomodel.Order{
 		OrderUUID:       order.OrderUUID,
 		UserUUID:        order.UserUUID,
-		Status:          order.Status,
+		Status:          repomodel.OrderStatus(order.Status),
 		PartUuids:       order.PartUuids,
 		TotalPrice:      order.TotalPrice,
 		TransactionUUID: order.TransactionUUID,
-		PaymentMethod:   order.PaymentMethod,
+		PaymentMethod:   PaymentMethodToModel(order.PaymentMethod),
 	}
 }

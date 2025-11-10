@@ -24,7 +24,7 @@ func ModelToPart(part model.Part) *inventory_v1.Part {
 		Description:   part.Description,
 		Price:         part.Price,
 		StockQuantity: part.StockQuantity,
-		Category:      inventory_v1.Category(inventory_v1.Category_value[part.Category]),
+		Category:      inventory_v1.Category(inventory_v1.Category_value[string(part.Category)]),
 		Dimensions:    DimensionsToProto(part.Dimensions),
 		Manufacturer:  ManufacturerToProto(part.Manufacturer),
 		Tags:          part.Tags,
@@ -54,7 +54,7 @@ func ManufacturerToProto(manufacturer *model.Manufacturer) *inventory_v1.Manufac
 }
 
 // MetadataToProto конвертирует модель бизнес-логики метаданных в прото-модель.
-func MetadataToProto(metadata map[string]*model.Value) map[string]*inventory_v1.Value {
+func MetadataToProto(metadata map[string]model.Value) map[string]*inventory_v1.Value {
 	result := make(map[string]*inventory_v1.Value, len(metadata))
 	for key, value := range metadata {
 		result[key] = ValueToProto(value)
@@ -63,10 +63,7 @@ func MetadataToProto(metadata map[string]*model.Value) map[string]*inventory_v1.
 }
 
 // ValueToProto конвертирует модель бизнес-логики значения в прото-модель.
-func ValueToProto(value *model.Value) *inventory_v1.Value {
-	if value == nil {
-		return nil
-	}
+func ValueToProto(value model.Value) *inventory_v1.Value {
 	if value.StringValue != nil {
 		return &inventory_v1.Value{ValueType: &inventory_v1.Value_StringValue{StringValue: *value.StringValue}}
 	}

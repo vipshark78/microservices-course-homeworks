@@ -1,5 +1,13 @@
 package model
 
-import "errors"
+import (
+	"errors"
 
-var ErrPartNotFound = errors.New("part not found")
+	sharedErrors "github.com/vipshark78/microservices-course-homeworks/shared/pkg/errors"
+)
+
+var (
+	ErrPartNotFound   = sharedErrors.NewNotFoundError(errors.New("part not found"))
+	ErrInvalidUUID    = sharedErrors.NewInvalidArgumentError(errors.New("invalid uuid"))
+	ErrInvalidRequest = sharedErrors.NewInvalidArgumentError(errors.New("invalid request"))
+)

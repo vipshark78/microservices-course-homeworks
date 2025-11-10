@@ -10,5 +10,5 @@ type OrderService interface {
 	CreateOrder(ctx context.Context, userUuid string, partUuids []string) (model.Order, error)
 	OrderByUUID(ctx context.Context, orderUuid string) (model.Order, error)
 	OrderCancel(ctx context.Context, orderUuid string) error
-	OrderPay(ctx context.Context, orderUuid, paymentMethod string) (string, error)
+	OrderPay(ctx context.Context, orderUuid string, paymentMethod model.PaymentMethod) (string, error)
 }

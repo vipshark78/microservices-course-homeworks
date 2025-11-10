@@ -3,6 +3,7 @@ package order
 import (
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
 )
@@ -26,8 +27,8 @@ func (s *ServiceSuite) TestOrderCreateSuccess() {
 			UserUUID:        reqUUID.String(),
 			PartUuids:       partsUUIDsString,
 			TotalPrice:      totalPrice,
-			TransactionUUID: reqUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(reqUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPENDINGPAYMENT,
 		}
 	)

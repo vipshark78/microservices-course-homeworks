@@ -6,7 +6,7 @@ import (
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
 )
 
-func (s *service) OrderPay(ctx context.Context, orderUuid, paymentMethod string) (string, error) {
+func (s *service) OrderPay(ctx context.Context, orderUuid string, paymentMethod model.PaymentMethod) (string, error) {
 	order, err := s.orderRepository.Read(ctx, orderUuid)
 	if err != nil {
 		return "", err
@@ -25,10 +25,10 @@ func (s *service) OrderPay(ctx context.Context, orderUuid, paymentMethod string)
 	}
 
 	order.Status = model.OrderStatusPAID
-	order.PaymentMethod = paymentMethod
-	order.TransactionUUID = transactionUUID
+	order.PaymentMethod = &paymentMethod
+	order.TransactionUUID = &transactionUUID
 
-	err = s.orderRepository.Update(order)
+	err = s.orderRepository.Update(ctx, order)
 	if err != nil {
 		return "", err
 	}

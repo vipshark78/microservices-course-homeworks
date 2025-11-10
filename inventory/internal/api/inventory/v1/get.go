@@ -2,10 +2,8 @@ package v1
 
 import (
 	"context"
-	"errors"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/google/uuid"
 
 	"github.com/vipshark78/microservices-course-homeworks/inventory/internal/converter"
 	"github.com/vipshark78/microservices-course-homeworks/inventory/internal/model"
@@ -15,17 +13,19 @@ import (
 // GetPart возвращает информацию о детали по UUID
 func (a *api) GetPart(ctx context.Context, req *inventory_v1.GetPartRequest) (*inventory_v1.GetPartResponse, error) {
 	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid request")
+		return nil, model.ErrInvalidRequest
 	}
 	if req.Uuid == "" {
-		return nil, status.Error(codes.InvalidArgument, "invalid request: uuid is empty")
+		return nil, model.ErrInvalidUUID
 	}
-	part, err := a.inventoryService.GetPart(ctx, req.Uuid)
+	uuid, err := uuid.Parse(req.Uuid)
 	if err != nil {
-		if errors.Is(err, model.ErrPartNotFound) {
-			return nil, status.Errorf(codes.NotFound, "no part with uuid '%s'", req.Uuid)
-		}
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, model.ErrInvalidUUID
+	}
+
+	part, err := a.inventoryService.GetPart(ctx, uuid)
+	if err != nil {
+		return nil, err
 	}
 
 	return &inventory_v1.GetPartResponse{

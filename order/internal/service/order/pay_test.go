@@ -2,6 +2,7 @@ package order
 
 import (
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
 )
@@ -14,8 +15,8 @@ func (s *ServiceSuite) TestOrderPaySuccess() {
 			UserUUID:        orderUUID.String(),
 			PartUuids:       []string{orderUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: orderUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(orderUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPENDINGPAYMENT,
 		}
 		payOrder = model.PayOrder{
@@ -29,8 +30,8 @@ func (s *ServiceSuite) TestOrderPaySuccess() {
 	s.paymentClient.On("PayOrder", s.ctx, payOrder).Return(orderUUID.String(), nil).Once()
 	orderPaid := order
 	orderPaid.Status = model.OrderStatusPAID
-	orderPaid.TransactionUUID = orderUUID.String()
-	s.repository.On("Update", orderPaid).Return(nil).Once()
+	orderPaid.TransactionUUID = lo.ToPtr(orderUUID.String())
+	s.repository.On("Update", s.ctx, orderPaid).Return(nil).Once()
 
 	resp, err := s.service.OrderPay(s.ctx, orderUUID.String(), model.PaymentMethodSBP)
 
@@ -58,8 +59,8 @@ func (s *ServiceSuite) TestOrderPayErrorOrderPaid() {
 			UserUUID:        orderUUID.String(),
 			PartUuids:       []string{orderUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: orderUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(orderUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPAID,
 		}
 	)
@@ -80,8 +81,8 @@ func (s *ServiceSuite) TestOrderPayErrorOrderCancelled() {
 			UserUUID:        orderUUID.String(),
 			PartUuids:       []string{orderUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: orderUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(orderUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusCANCELLED,
 		}
 	)
@@ -102,8 +103,8 @@ func (s *ServiceSuite) TestOrderPayErrorOrderUpdateError() {
 			UserUUID:        orderUUID.String(),
 			PartUuids:       []string{orderUUID.String()},
 			TotalPrice:      300,
-			TransactionUUID: orderUUID.String(),
-			PaymentMethod:   model.PaymentMethodSBP,
+			TransactionUUID: lo.ToPtr(orderUUID.String()),
+			PaymentMethod:   lo.ToPtr(model.PaymentMethodSBP),
 			Status:          model.OrderStatusPENDINGPAYMENT,
 		}
 		payOrder = model.PayOrder{
@@ -117,8 +118,8 @@ func (s *ServiceSuite) TestOrderPayErrorOrderUpdateError() {
 	s.paymentClient.On("PayOrder", s.ctx, payOrder).Return(orderUUID.String(), nil).Once()
 	orderPaid := order
 	orderPaid.Status = model.OrderStatusPAID
-	orderPaid.TransactionUUID = orderUUID.String()
-	s.repository.On("Update", orderPaid).Return(model.ErrOrderNotFound).Once()
+	orderPaid.TransactionUUID = lo.ToPtr(orderUUID.String())
+	s.repository.On("Update", s.ctx, orderPaid).Return(model.ErrOrderNotFound).Once()
 
 	resp, err := s.service.OrderPay(s.ctx, orderUUID.String(), model.PaymentMethodSBP)
 
