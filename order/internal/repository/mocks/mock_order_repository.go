@@ -25,9 +25,9 @@ func (_m *OrderRepository) EXPECT() *OrderRepository_Expecter {
 	return &OrderRepository_Expecter{mock: &_m.Mock}
 }
 
-// Insert provides a mock function with given fields: ctx, userUuid, partUuids, price
-func (_m *OrderRepository) Insert(ctx context.Context, userUuid string, partUuids []string, price float64) (model.Order, error) {
-	ret := _m.Called(ctx, userUuid, partUuids, price)
+// Insert provides a mock function with given fields: ctx, userUuid, partUuids, price, status
+func (_m *OrderRepository) Insert(ctx context.Context, userUuid string, partUuids []string, price float64, status model.OrderStatus) (model.Order, error) {
+	ret := _m.Called(ctx, userUuid, partUuids, price, status)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Insert")
@@ -35,17 +35,17 @@ func (_m *OrderRepository) Insert(ctx context.Context, userUuid string, partUuid
 
 	var r0 model.Order
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, []string, float64) (model.Order, error)); ok {
-		return rf(ctx, userUuid, partUuids, price)
+	if rf, ok := ret.Get(0).(func(context.Context, string, []string, float64, model.OrderStatus) (model.Order, error)); ok {
+		return rf(ctx, userUuid, partUuids, price, status)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, []string, float64) model.Order); ok {
-		r0 = rf(ctx, userUuid, partUuids, price)
+	if rf, ok := ret.Get(0).(func(context.Context, string, []string, float64, model.OrderStatus) model.Order); ok {
+		r0 = rf(ctx, userUuid, partUuids, price, status)
 	} else {
 		r0 = ret.Get(0).(model.Order)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, []string, float64) error); ok {
-		r1 = rf(ctx, userUuid, partUuids, price)
+	if rf, ok := ret.Get(1).(func(context.Context, string, []string, float64, model.OrderStatus) error); ok {
+		r1 = rf(ctx, userUuid, partUuids, price, status)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -63,13 +63,14 @@ type OrderRepository_Insert_Call struct {
 //   - userUuid string
 //   - partUuids []string
 //   - price float64
-func (_e *OrderRepository_Expecter) Insert(ctx interface{}, userUuid interface{}, partUuids interface{}, price interface{}) *OrderRepository_Insert_Call {
-	return &OrderRepository_Insert_Call{Call: _e.mock.On("Insert", ctx, userUuid, partUuids, price)}
+//   - status model.OrderStatus
+func (_e *OrderRepository_Expecter) Insert(ctx interface{}, userUuid interface{}, partUuids interface{}, price interface{}, status interface{}) *OrderRepository_Insert_Call {
+	return &OrderRepository_Insert_Call{Call: _e.mock.On("Insert", ctx, userUuid, partUuids, price, status)}
 }
 
-func (_c *OrderRepository_Insert_Call) Run(run func(ctx context.Context, userUuid string, partUuids []string, price float64)) *OrderRepository_Insert_Call {
+func (_c *OrderRepository_Insert_Call) Run(run func(ctx context.Context, userUuid string, partUuids []string, price float64, status model.OrderStatus)) *OrderRepository_Insert_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].([]string), args[3].(float64))
+		run(args[0].(context.Context), args[1].(string), args[2].([]string), args[3].(float64), args[4].(model.OrderStatus))
 	})
 	return _c
 }
@@ -79,7 +80,7 @@ func (_c *OrderRepository_Insert_Call) Return(_a0 model.Order, _a1 error) *Order
 	return _c
 }
 
-func (_c *OrderRepository_Insert_Call) RunAndReturn(run func(context.Context, string, []string, float64) (model.Order, error)) *OrderRepository_Insert_Call {
+func (_c *OrderRepository_Insert_Call) RunAndReturn(run func(context.Context, string, []string, float64, model.OrderStatus) (model.Order, error)) *OrderRepository_Insert_Call {
 	_c.Call.Return(run)
 	return _c
 }

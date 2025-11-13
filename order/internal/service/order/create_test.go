@@ -34,7 +34,7 @@ func (s *ServiceSuite) TestOrderCreateSuccess() {
 	)
 
 	s.inventoryClient.On("ListParts", s.ctx, partsUUIDs).Return(parts, nil).Once()
-	s.repository.On("Insert", s.ctx, reqUUID.String(), partsUUIDsString, totalPrice).Return(order, nil).Once()
+	s.repository.On("Insert", s.ctx, reqUUID.String(), partsUUIDsString, totalPrice, order.Status).Return(order, nil).Once()
 
 	res, err := s.service.CreateOrder(s.ctx, reqUUID.String(), partsUUIDsString)
 

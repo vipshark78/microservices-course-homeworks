@@ -23,7 +23,7 @@ func FilterToBsonFilter(repoFilter model.PartsFilter) bson.M {
 		filter["category"] = bson.M{"$in": categories}
 	}
 	if len(repoFilter.ManufacturerCountries) > 0 {
-		filter["manufacturer"] = bson.M{"$in": repoFilter.ManufacturerCountries}
+		filter["manufacturer.country"] = bson.M{"$in": repoFilter.ManufacturerCountries}
 	}
 	if len(repoFilter.Tags) > 0 {
 		filter["tags"] = bson.M{"$all": repoFilter.Tags}
