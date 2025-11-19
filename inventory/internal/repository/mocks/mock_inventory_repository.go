@@ -86,6 +86,52 @@ func (_c *InventoryRepository_GetPart_Call) RunAndReturn(run func(context.Contex
 	return _c
 }
 
+// Init provides a mock function with given fields: ctx
+func (_m *InventoryRepository) Init(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Init")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// InventoryRepository_Init_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Init'
+type InventoryRepository_Init_Call struct {
+	*mock.Call
+}
+
+// Init is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *InventoryRepository_Expecter) Init(ctx interface{}) *InventoryRepository_Init_Call {
+	return &InventoryRepository_Init_Call{Call: _e.mock.On("Init", ctx)}
+}
+
+func (_c *InventoryRepository_Init_Call) Run(run func(ctx context.Context)) *InventoryRepository_Init_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *InventoryRepository_Init_Call) Return(_a0 error) *InventoryRepository_Init_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *InventoryRepository_Init_Call) RunAndReturn(run func(context.Context) error) *InventoryRepository_Init_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // InsertPart provides a mock function with given fields: ctx, part
 func (_m *InventoryRepository) InsertPart(ctx context.Context, part repositorymodel.Part) error {
 	ret := _m.Called(ctx, part)

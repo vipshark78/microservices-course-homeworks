@@ -14,7 +14,7 @@ func (s *service) CreateOrder(ctx context.Context, userUuid string, partUuids []
 
 	price := s.calculatePrice(parts)
 
-	return s.orderRepository.Insert(ctx, userUuid, partUuids, price)
+	return s.orderRepository.Insert(ctx, userUuid, partUuids, price, model.OrderStatusPENDINGPAYMENT)
 }
 
 func (s *service) calculatePrice(parts []model.Part) float64 {

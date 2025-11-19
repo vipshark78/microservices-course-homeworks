@@ -13,4 +13,5 @@ type InventoryRepository interface {
 	GetPart(ctx context.Context, uuid uuid.UUID) (model.Part, error)
 	ListParts(ctx context.Context, filter model.PartsFilter) ([]model.Part, error)
 	InsertPart(ctx context.Context, part repoModel.Part) error
+	Init(ctx context.Context) error
 }

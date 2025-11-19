@@ -61,8 +61,8 @@ func GetBusinessError(err error) *businessError {
 	return nil
 }
 
-// errorCodeToGRPCCode получает код ошибки и возвращает соответствующий код gRPC
-func errorCodeToGRPCCode(code ErrorCode) codes.Code {
+// ErrorCodeToGRPCCode получает код ошибки и возвращает соответствующий код gRPC
+func ErrorCodeToGRPCCode(code ErrorCode) codes.Code {
 	switch code {
 	case NotFoundErrCode:
 		return codes.NotFound
@@ -75,6 +75,6 @@ func errorCodeToGRPCCode(code ErrorCode) codes.Code {
 
 // BusinessErrorToGRPCStatus конвертирует бизнес ошибку в статус gRPC
 func BusinessErrorToGRPCStatus(err *businessError) *status.Status {
-	grpcCode := errorCodeToGRPCCode(err.Code())
+	grpcCode := ErrorCodeToGRPCCode(err.Code())
 	return status.New(grpcCode, err.Error())
 }

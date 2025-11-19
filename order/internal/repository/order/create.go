@@ -13,7 +13,7 @@ import (
 	repomodel "github.com/vipshark78/microservices-course-homeworks/order/internal/repository/model"
 )
 
-func (r *repository) Insert(ctx context.Context, userUuid string, partUuids []string, price float64) (model.Order, error) {
+func (r *repository) Insert(ctx context.Context, userUuid string, partUuids []string, price float64, status model.OrderStatus) (model.Order, error) {
 	builderInsert := sq.
 		Insert(repomodel.TableName).
 		PlaceholderFormat(sq.Dollar).
@@ -27,7 +27,7 @@ func (r *repository) Insert(ctx context.Context, userUuid string, partUuids []st
 			userUuid,
 			partUuids,
 			price,
-			model.OrderStatusPENDINGPAYMENT,
+			status,
 		).
 		Suffix(fmt.Sprintf("RETURNING %s", repomodel.ColumnOrderUUID))
 

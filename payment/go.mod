@@ -1,7 +1,35 @@
 module github.com/vipshark78/microservices-course-homeworks/payment
 
 replace (
+	github.com/vipshark78/microservices-course-homeworks/platform => ../platform
 	github.com/vipshark78/microservices-course-homeworks/shared => ../shared
 )
 
 go 1.25.2
+
+require (
+	github.com/caarlos0/env/v11 v11.3.1
+	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
+	github.com/stretchr/testify v1.11.1
+	github.com/vipshark78/microservices-course-homeworks/platform v0.0.0-00010101000000-000000000000
+	github.com/vipshark78/microservices-course-homeworks/shared v0.0.0-00010101000000-000000000000
+	go.uber.org/zap v1.27.0
+	google.golang.org/grpc v1.76.0
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251007200510-49b9836ed3ff // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251002232023-7c0ddcbb5797 // indirect
+	google.golang.org/protobuf v1.36.10 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)

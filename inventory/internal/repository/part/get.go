@@ -2,8 +2,8 @@ package part
 
 import (
 	"context"
+	"errors"
 
-	"github.com/go-faster/errors"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
