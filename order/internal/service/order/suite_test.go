@@ -7,7 +7,8 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	grpcMocks "github.com/vipshark78/microservices-course-homeworks/order/internal/client/grpc/mocks"
-	"github.com/vipshark78/microservices-course-homeworks/order/internal/repository/mocks"
+	repoMocks "github.com/vipshark78/microservices-course-homeworks/order/internal/repository/mocks"
+	serviceMocks "github.com/vipshark78/microservices-course-homeworks/order/internal/service/mocks"
 )
 
 type ServiceSuite struct {
@@ -15,10 +16,11 @@ type ServiceSuite struct {
 
 	ctx context.Context
 
-	repository *mocks.OrderRepository
+	repository *repoMocks.OrderRepository
 
 	inventoryClient *grpcMocks.InventoryClient
 	paymentClient   *grpcMocks.PaymentClient
+	producerService *serviceMocks.OrderProducerService
 
 	service *service
 }
@@ -26,14 +28,15 @@ type ServiceSuite struct {
 func (s *ServiceSuite) SetupTest() {
 	s.ctx = context.Background()
 
-	s.repository = mocks.NewOrderRepository(s.T())
+	s.repository = repoMocks.NewOrderRepository(s.T())
 	s.inventoryClient = grpcMocks.NewInventoryClient(s.T())
 	s.paymentClient = grpcMocks.NewPaymentClient(s.T())
-
+	s.producerService = serviceMocks.NewOrderProducerService(s.T())
 	s.service = NewService(
 		s.repository,
 		s.inventoryClient,
 		s.paymentClient,
+		s.producerService,
 	)
 }
 

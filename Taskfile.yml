@@ -42,8 +42,8 @@ vars:
   POSTGRES_DSN: 'postgres://order-service-user:order-service-password@localhost:5432/order-service?sslmode=disable'
 
 
-  MODULES: inventory order payment platform
-  SERVICES: core,inventory,order,payment
+  MODULES: inventory order payment platform notification assembly
+  SERVICES: core,inventory,order,payment,assembly,notification
 
 tasks:
   install-formatters:
