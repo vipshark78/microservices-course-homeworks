@@ -3,6 +3,7 @@ package order
 import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/model"
 )
@@ -28,6 +29,12 @@ func (s *ServiceSuite) TestOrderPaySuccess() {
 
 	s.repository.On("Read", s.ctx, orderUUID.String()).Return(order, nil).Once()
 	s.paymentClient.On("PayOrder", s.ctx, payOrder).Return(orderUUID.String(), nil).Once()
+	s.producerService.On("ProduceOrderPaid", s.ctx, mock.MatchedBy(func(event model.OrderPaidEvent) bool {
+		return event.OrderUUID == orderUUID.String() &&
+			event.UserUUID == orderUUID.String() &&
+			event.PaymentMethod == "SBP" &&
+			event.TransactionUUID == orderUUID.String()
+	})).Return(nil).Once()
 	orderPaid := order
 	orderPaid.Status = model.OrderStatusPAID
 	orderPaid.TransactionUUID = lo.ToPtr(orderUUID.String())
@@ -116,6 +123,12 @@ func (s *ServiceSuite) TestOrderPayErrorOrderUpdateError() {
 
 	s.repository.On("Read", s.ctx, orderUUID.String()).Return(order, nil).Once()
 	s.paymentClient.On("PayOrder", s.ctx, payOrder).Return(orderUUID.String(), nil).Once()
+	s.producerService.On("ProduceOrderPaid", s.ctx, mock.MatchedBy(func(event model.OrderPaidEvent) bool {
+		return event.OrderUUID == orderUUID.String() &&
+			event.UserUUID == orderUUID.String() &&
+			event.PaymentMethod == "SBP" &&
+			event.TransactionUUID == orderUUID.String()
+	})).Return(nil).Once()
 	orderPaid := order
 	orderPaid.Status = model.OrderStatusPAID
 	orderPaid.TransactionUUID = lo.ToPtr(orderUUID.String())
