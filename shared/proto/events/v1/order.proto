@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package events.v1;
+
+option go_package = "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/events/v1;events_v1";
+
+// OrderPaid сообщение об оплате заказа
+message OrderPaid{
+    string event_uuid = 1;
+    string order_uuid = 2;
+    string user_uuid = 3;
+    string payment_method = 4;
+    string transaction_uuid = 5;
+}
+
+// OrderPaid сообщение об оплате заказа
+message OrderAssembled{
+    string event_uuid = 1;
+    string order_uuid = 2;
+    string user_uuid = 3;
+    int64 build_time_sec = 4;
+}
