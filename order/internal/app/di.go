@@ -2,7 +2,9 @@ package app
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/IBM/sarama"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
@@ -14,12 +16,20 @@ import (
 	inventory "github.com/vipshark78/microservices-course-homeworks/order/internal/client/grpc/inventory/v1"
 	payment "github.com/vipshark78/microservices-course-homeworks/order/internal/client/grpc/payment/v1"
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/config"
+	kafkaConverter "github.com/vipshark78/microservices-course-homeworks/order/internal/converter/kafka"
+	"github.com/vipshark78/microservices-course-homeworks/order/internal/converter/kafka/decoder"
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/repository"
 	orderRepository "github.com/vipshark78/microservices-course-homeworks/order/internal/repository/order"
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/service"
+	orderConsumer "github.com/vipshark78/microservices-course-homeworks/order/internal/service/consumer/order_consumer"
 	orderService "github.com/vipshark78/microservices-course-homeworks/order/internal/service/order"
+	orderProducer "github.com/vipshark78/microservices-course-homeworks/order/internal/service/producer/order_producer"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/closer"
+	wrappedKafka "github.com/vipshark78/microservices-course-homeworks/platform/pkg/kafka"
+	wrappedKafkaConsumer "github.com/vipshark78/microservices-course-homeworks/platform/pkg/kafka/consumer"
+	wrappedKafkaProducer "github.com/vipshark78/microservices-course-homeworks/platform/pkg/kafka/producer"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
+	kafkaMiddleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/kafka"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/migrator"
 	orderMigrator "github.com/vipshark78/microservices-course-homeworks/platform/pkg/migrator/pg"
 	order_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/openapi/order/v1"
@@ -28,15 +38,22 @@ import (
 )
 
 type diContainer struct {
-	orderV1API          order_v1.Handler
-	orderService        service.OrderService
-	orderRepository     repository.OrderRepository
-	pgxPool             *pgxpool.Pool
-	inventoryClient     grpc.InventoryClient
-	paymentClient       grpc.PaymentClient
-	inventoryClientConn *google_grpc.ClientConn
-	paymentClientConn   *google_grpc.ClientConn
-	orderMigrator       migrator.Migrator
+	orderV1API             order_v1.Handler
+	orderService           service.OrderService
+	orderRepository        repository.OrderRepository
+	pgxPool                *pgxpool.Pool
+	inventoryClient        grpc.InventoryClient
+	paymentClient          grpc.PaymentClient
+	inventoryClientConn    *google_grpc.ClientConn
+	paymentClientConn      *google_grpc.ClientConn
+	orderMigrator          migrator.Migrator
+	producerService        service.OrderProducerService
+	consumerService        service.ConsumerService
+	consumerGroup          sarama.ConsumerGroup
+	orderAssembledConsumer wrappedKafka.Consumer
+	orderAssembledDecoder  kafkaConverter.OrderAssembledDecoder
+	syncProducer           sarama.SyncProducer
+	orderPaidProducer      wrappedKafka.Producer
 }
 
 func NewDiContainer() *diContainer {
@@ -53,7 +70,7 @@ func (d *diContainer) OrderV1API(ctx context.Context) order_v1.Handler {
 
 func (d *diContainer) OrderService(ctx context.Context) service.OrderService {
 	if d.orderService == nil {
-		d.orderService = orderService.NewService(d.OrderRepository(ctx), d.InventoryClient(ctx), d.PaymentClient(ctx))
+		d.orderService = orderService.NewService(d.OrderRepository(ctx), d.InventoryClient(ctx), d.PaymentClient(ctx), d.ProducerService())
 	}
 
 	return d.orderService
@@ -160,4 +177,93 @@ func (d *diContainer) PaymentClientConn(ctx context.Context) *google_grpc.Client
 	}
 
 	return d.paymentClientConn
+}
+
+func (d *diContainer) ProducerService() service.OrderProducerService {
+	if d.producerService == nil {
+		d.producerService = orderProducer.NewService(d.OrderPaidProducer())
+	}
+
+	return d.producerService
+}
+
+func (d *diContainer) ConsumerService(ctx context.Context) service.ConsumerService {
+	if d.consumerService == nil {
+		d.consumerService = orderConsumer.NewService(d.OrderAssembledConsumer(), d.OrderAssembledDecoder(), d.OrderService(ctx))
+	}
+	return d.consumerService
+}
+
+func (d *diContainer) OrderAssembledDecoder() kafkaConverter.OrderAssembledDecoder {
+	if d.orderAssembledDecoder == nil {
+		d.orderAssembledDecoder = decoder.NewOrderAssembledDecoder()
+	}
+	return d.orderAssembledDecoder
+}
+
+func (d *diContainer) OrderAssembledConsumer() wrappedKafka.Consumer {
+	if d.orderAssembledConsumer == nil {
+		d.orderAssembledConsumer = wrappedKafkaConsumer.NewConsumer(
+			d.ConsumerGroup(),
+			[]string{
+				config.AppConfig().OrderAssembledConsumer.Topic(),
+			},
+			logger.Logger(),
+			kafkaMiddleware.Logging(logger.Logger()),
+		)
+	}
+
+	return d.orderAssembledConsumer
+}
+
+func (d *diContainer) ConsumerGroup() sarama.ConsumerGroup {
+	if d.consumerGroup == nil {
+		consumerGroup, err := sarama.NewConsumerGroup(
+			config.AppConfig().Kafka.Brokers(),
+			config.AppConfig().OrderAssembledConsumer.GroupID(),
+			config.AppConfig().OrderAssembledConsumer.Config(),
+		)
+		if err != nil {
+			panic(fmt.Sprintf("❌ Ошибка создания consumer group: %s\n", err.Error()))
+		}
+
+		// Добавляем закрытие ConsumerGroup
+		closer.AddNamed("Kafka consumer group", func(ctx context.Context) error {
+			return d.consumerGroup.Close()
+		})
+
+		d.consumerGroup = consumerGroup
+	}
+
+	return d.consumerGroup
+}
+
+func (d *diContainer) OrderPaidProducer() wrappedKafka.Producer {
+	if d.orderPaidProducer == nil {
+		d.orderPaidProducer = wrappedKafkaProducer.NewProducer(
+			d.SyncProducer(),
+			config.AppConfig().OrderPaidProducer.Topic(),
+			logger.Logger(),
+		)
+	}
+
+	return d.orderPaidProducer
+}
+
+func (d *diContainer) SyncProducer() sarama.SyncProducer {
+	if d.syncProducer == nil {
+		p, err := sarama.NewSyncProducer(
+			config.AppConfig().Kafka.Brokers(),
+			config.AppConfig().OrderPaidProducer.Config(),
+		)
+		if err != nil {
+			panic(fmt.Sprintf("❌ Ошибка создания sync producer: %s\n", err.Error()))
+		}
+
+		// Добавляем закрытие producer
+		closer.AddNamed("Kafka sync producer", func(ctx context.Context) error { return p.Close() })
+
+		d.syncProducer = p
+	}
+	return d.syncProducer
 }

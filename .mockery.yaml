@@ -16,6 +16,9 @@ packages:
     config:
       include-regex: ".*Repository"
 
+  github.com/vipshark78/microservices-course-homeworks/payment/internal/config:
+    config:
+      include-regex: ".*Config"
 
   github.com/vipshark78/microservices-course-homeworks/inventory/internal/service:
     config:
@@ -24,6 +27,10 @@ packages:
   github.com/vipshark78/microservices-course-homeworks/inventory/internal/repository:
     config:
       include-regex: ".*Repository"
+
+  github.com/vipshark78/microservices-course-homeworks/inventory/internal/config:
+    config:
+      include-regex: ".*Config"
 
   github.com/vipshark78/microservices-course-homeworks/order/internal/service:
     config:
@@ -36,3 +43,23 @@ packages:
   github.com/vipshark78/microservices-course-homeworks/order/internal/client/grpc:
     config:
       include-regex: ".*Client"
+
+  github.com/vipshark78/microservices-course-homeworks/order/internal/config:
+    config:
+      include-regex: ".*Config"
+
+  github.com/vipshark78/microservices-course-homeworks/assembly/internal/service:
+    config:
+      include-regex: ".*Service"
+
+  github.com/vipshark78/microservices-course-homeworks/assembly/internal/config:
+    config:
+      include-regex: ".*Config"
+
+  github.com/vipshark78/microservices-course-homeworks/notification/internal/service:
+    config:
+      include-regex: ".*Service"
+
+  github.com/vipshark78/microservices-course-homeworks/notification/internal/config:
+    config:
+      include-regex: ".*Config"
