@@ -39,6 +39,8 @@ func ConvertModelToOrderStatus(modelStatus model.OrderStatus) order_v1.OrderStat
 		return order_v1.OrderStatusPAID
 	case model.OrderStatusCANCELLED:
 		return order_v1.OrderStatusCANCELLED
+	case model.OrderStatusAssembled:
+		return order_v1.OrderStatusASSEMBLED
 	}
 	return order_v1.OrderStatusPENDINGPAYMENT
 }

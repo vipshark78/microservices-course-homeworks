@@ -29,10 +29,13 @@ import (
 	wrappedKafkaConsumer "github.com/vipshark78/microservices-course-homeworks/platform/pkg/kafka/consumer"
 	wrappedKafkaProducer "github.com/vipshark78/microservices-course-homeworks/platform/pkg/kafka/producer"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
+	grpcMidlleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
+	httpMidlleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/http"
 	kafkaMiddleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/kafka"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/migrator"
 	orderMigrator "github.com/vipshark78/microservices-course-homeworks/platform/pkg/migrator/pg"
 	order_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/openapi/order/v1"
+	auth_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
 	payment_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/payment/v1"
 )
@@ -54,6 +57,7 @@ type diContainer struct {
 	orderAssembledDecoder  kafkaConverter.OrderAssembledDecoder
 	syncProducer           sarama.SyncProducer
 	orderPaidProducer      wrappedKafka.Producer
+	iamClient              httpMidlleware.IAMClient
 }
 
 func NewDiContainer() *diContainer {
@@ -266,4 +270,32 @@ func (d *diContainer) SyncProducer() sarama.SyncProducer {
 		d.syncProducer = p
 	}
 	return d.syncProducer
+}
+
+func (d *diContainer) IAMClient(ctx context.Context) grpcMidlleware.IAMClient {
+	if d.iamClient == nil {
+		grpcIAM := auth_v1.NewAuthServiceClient(d.IAMConn(ctx))
+		d.iamClient = grpcIAM
+	}
+	return d.iamClient
+}
+
+func (d *diContainer) IAMConn(_ context.Context) *google_grpc.ClientConn {
+	conn, err := google_grpc.NewClient(
+		config.AppConfig().IAMGRPC.Address(),
+		google_grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic(fmt.Sprintf("❌ Ошибка подключения к IAM Service: %v", err))
+	}
+
+	closer.AddNamed("IAM client", func(ctx context.Context) error {
+		if err := conn.Close(); err != nil {
+			logger.Error(ctx, "❌ Ошибка при закрытии подключения с IAM Service", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+
+	return conn
 }

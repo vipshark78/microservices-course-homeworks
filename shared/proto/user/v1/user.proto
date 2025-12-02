@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/user/v1;user_v1";
+
+// UserService сервис для регистрации пользователей и получения информации о них.
+service UserService {
+  // Register метод для регистрации пользователя.
+  rpc Register(RegisterRequest)  returns (RegisterResponse);
+
+  // GetUser метод для получения информации о пользователе.
+  rpc GetUser(GetUserRequest)  returns (GetUserResponse);
+}
+
+// RegisterRequest запрос на регистрацию пользователя.
+message RegisterRequest {
+  UserRegistrationInfo info = 1;
+}
+
+// RegisterResponse ответ на регистрацию пользователя.
+// Возвращает UUID зарегистрированного пользователя.
+message RegisterResponse {
+  string user_uuid = 1;
+}
+
+// GetUserRequest запрос на получение информации о пользователе.
+message GetUserRequest {
+  string user_uuid = 1;
+}
+
+// GetUserResponse ответ на получение информации о пользователе.
+message GetUserResponse {
+  common.v1.User user = 1;
+}
+
+// UserRegistrationInfo информация о пользователе.
+message UserRegistrationInfo {
+  common.v1.UserInfo info = 1;
+  string password = 2;
+}
