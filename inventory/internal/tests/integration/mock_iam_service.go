@@ -33,9 +33,9 @@ func (m *mockIAMService) Whoami(ctx context.Context, req *authV1.WhoamiRequest) 
 }
 
 type MockIAMContainer struct {
-	server     *grpc.Server
-	listener   net.Listener
-	address    string
+	server   *grpc.Server
+	listener net.Listener
+	address  string
 }
 
 func NewMockIAMContainer(address string) *MockIAMContainer {

@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	grpcMiddleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
 	repoModel "github.com/vipshark78/microservices-course-homeworks/inventory/internal/repository/model"
+	grpcMiddleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
 )
 
