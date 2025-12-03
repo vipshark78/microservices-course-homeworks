@@ -8,8 +8,10 @@ import (
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	grpcMiddleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
 	repoModel "github.com/vipshark78/microservices-course-homeworks/inventory/internal/repository/model"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
 )
@@ -114,4 +116,9 @@ func (env *TestEnvironment) ClearPartsCollection(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// AddSessionUUIDToContext добавляет session-uuid в исходящие gRPC metadata контекста
+func AddSessionUUIDToContext(ctx context.Context, sessionUUID string) context.Context {
+	return metadata.AppendToOutgoingContext(ctx, grpcMiddleware.SessionUUIDMetadataKey, sessionUUID)
 }

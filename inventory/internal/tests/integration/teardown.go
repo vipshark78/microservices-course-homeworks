@@ -36,6 +36,14 @@ func cleanupTestEnvironment(ctx context.Context, env *TestEnvironment) {
 		}
 	}
 
+	if env.MockIAM != nil {
+		if err := env.MockIAM.Stop(); err != nil {
+			logger.Error(ctx, "не удалось остановить mock IAM сервис", zap.Error(err))
+		} else {
+			logger.Info(ctx, "🛑 Mock IAM сервис остановлен")
+		}
+	}
+
 	if env.Network != nil {
 		if err := env.Network.Remove(ctx); err != nil {
 			logger.Error(ctx, "не удалось удалить сеть", zap.Error(err))
