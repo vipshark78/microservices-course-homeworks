@@ -15,7 +15,6 @@ func (a *api) Login(ctx context.Context, request *authv1.LoginRequest) (*authv1.
 		return &authv1.LoginResponse{}, model.ErrInvalidCredentials
 	}
 	sessionUUID, err := a.service.Login(ctx, request.Login, request.Password)
-
 	if err != nil {
 		return &authv1.LoginResponse{}, err
 	}
