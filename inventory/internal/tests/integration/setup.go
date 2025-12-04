@@ -89,7 +89,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		testcontainers.MongoHostKey: generatedMongo.Config().ContainerName,
 		testcontainers.MongoPortKey: testcontainers.MongoPort,
 		// Переопределяем адрес IAM сервиса на mock
-		"IAM_GRPC_HOST": "host.docker.internal",
+		"IAM_GRPC_HOST": "0.0.0.0",
 		"IAM_GRPC_PORT": "50053",
 	}
 
