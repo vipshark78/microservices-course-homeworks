@@ -58,7 +58,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	grpcPort := getEnvWithLogging(ctx, grpcPortKey)
 
 	// Шаг 2: Запускаем mock IAM сервис
-	mockIAM := NewMockIAMContainer("localhost:50053")
+	mockIAM := NewMockIAMContainer("0.0.0.0:50053")
 	err = mockIAM.Start(ctx)
 	if err != nil {
 		logger.Fatal(ctx, "не удалось запустить mock IAM сервис", zap.Error(err))
@@ -89,7 +89,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		testcontainers.MongoHostKey: generatedMongo.Config().ContainerName,
 		testcontainers.MongoPortKey: testcontainers.MongoPort,
 		// Переопределяем адрес IAM сервиса на mock
-		"IAM_GRPC_HOST": "0.0.0.0",
+		"IAM_GRPC_HOST": "host.docker.internal",
 		"IAM_GRPC_PORT": "50053",
 	}
 
