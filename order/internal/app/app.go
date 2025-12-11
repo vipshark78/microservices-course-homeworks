@@ -13,6 +13,7 @@ import (
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/config"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/closer"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
+	httpMidlleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/http"
 	order_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/openapi/order/v1"
 )
 
@@ -103,6 +104,7 @@ func (a *App) initCloser(_ context.Context) error {
 }
 
 func (a *App) initHTTPServer(ctx context.Context) error {
+	authMiddleware := httpMidlleware.NewAuthMiddleware(a.diContainer.IAMClient(ctx))
 	orderServer, err := order_v1.NewServer(a.diContainer.OrderV1API(ctx))
 	if err != nil {
 		return err
@@ -114,6 +116,7 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.Timeout(config.AppConfig().OrderHTTP.OperationTimeout()))
+	router.Use(authMiddleware.Handle)
 
 	// Монтируем обработчики OpenAPI
 	router.Mount("/", orderServer)

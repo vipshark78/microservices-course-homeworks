@@ -55,7 +55,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("должен успешно возвращать деталь по UUID", func() {
-			resp, err := inventoryClient.GetPart(ctx, &inventoryV1.GetPartRequest{
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.GetPart(ctxWithSession, &inventoryV1.GetPartRequest{
 				Uuid: partUUID,
 			})
 			Expect(err).ToNot(HaveOccurred())
@@ -75,7 +76,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должна вернуться ошибка, передан nil request", func() {
-			resp, err := inventoryClient.GetPart(ctx, nil)
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.GetPart(ctxWithSession, nil)
 			Expect(err).To(HaveOccurred())
 			grpcStatus, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
@@ -84,7 +86,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должна вернуться ошибка, передан пустой UUID", func() {
-			resp, err := inventoryClient.GetPart(ctx, &inventoryV1.GetPartRequest{})
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.GetPart(ctxWithSession, &inventoryV1.GetPartRequest{})
 			Expect(err).To(HaveOccurred())
 			grpcStatus, ok := status.FromError(err)
 			Expect(ok).To(BeTrue())
@@ -93,7 +96,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должна вернуться ошибка, передан несуществующий UUID", func() {
-			resp, err := inventoryClient.GetPart(ctx, &inventoryV1.GetPartRequest{
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.GetPart(ctxWithSession, &inventoryV1.GetPartRequest{
 				Uuid: gofakeit.UUID(),
 			})
 			Expect(err).To(HaveOccurred())
@@ -118,7 +122,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должны вернуться все детали, передан пустой фильтр", func() {
-			resp, err := inventoryClient.ListParts(ctx, &inventoryV1.ListPartsRequest{
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.ListParts(ctxWithSession, &inventoryV1.ListPartsRequest{
 				Filter: &inventoryV1.PartsFilter{},
 			})
 			Expect(err).ToNot(HaveOccurred())
@@ -127,12 +132,13 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должна вернуться 1 деталь, передан фильтр с 1 существующим UUID", func() {
-			resp, err := inventoryClient.ListParts(ctx, &inventoryV1.ListPartsRequest{
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.ListParts(ctxWithSession, &inventoryV1.ListPartsRequest{
 				Filter: &inventoryV1.PartsFilter{},
 			})
 			GinkgoWriter.Printf("Response parts: %v\n", resp.Parts)
 
-			resp, err = inventoryClient.ListParts(ctx, &inventoryV1.ListPartsRequest{
+			resp, err = inventoryClient.ListParts(ctxWithSession, &inventoryV1.ListPartsRequest{
 				Filter: &inventoryV1.PartsFilter{
 					Uuids: []string{partUUIDs[0]},
 				},
@@ -149,7 +155,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должен вернуться пустой список деталей, передан фильтр с 1 несуществующим UUID", func() {
-			resp, err := inventoryClient.ListParts(ctx, &inventoryV1.ListPartsRequest{
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.ListParts(ctxWithSession, &inventoryV1.ListPartsRequest{
 				Filter: &inventoryV1.PartsFilter{
 					Uuids: []string{gofakeit.UUID()},
 				},
@@ -160,7 +167,8 @@ var _ = Describe("InventoryService", func() {
 		})
 
 		It("Должна вернуться ошибка, передан nil фильтр", func() {
-			resp, err := inventoryClient.ListParts(ctx, &inventoryV1.ListPartsRequest{
+			ctxWithSession := AddSessionUUIDToContext(ctx, gofakeit.UUID())
+			resp, err := inventoryClient.ListParts(ctxWithSession, &inventoryV1.ListPartsRequest{
 				Filter: nil,
 			})
 			Expect(err).To(HaveOccurred())

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package auth.v1;
+
+import "common/v1/common.proto";
+
+option go_package = "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1;auth_v1";
+
+// AuthService сервис для аутентификации пользователей
+service AuthService {
+    // Login метод возвращающий сессию пользователя по аутентификационным данным.
+    rpc Login(LoginRequest) returns (LoginResponse);
+
+    // Whoami метод возвращающий данные о текущем пользователе.
+    rpc Whoami(WhoamiRequest) returns (WhoamiResponse);
+}
+
+// LoginRequest запрос на аутентификацию.
+message LoginRequest{
+  string login = 1;
+  string password = 2;
+}
+
+// LoginResponse ответ на аутентификацию.
+message LoginResponse{
+  string session_uuid = 1;
+}
+
+// WhoamiRequest запрос на получение данных о пользователе по сессии.
+message WhoamiRequest{
+  string session_uuid = 1;
+}
+
+// WhoamiResponse ответ возвращающий данные о пользователе.
+message WhoamiResponse{
+  common.v1.Session  session = 1;
+  common.v1.User     user   = 2;
+}

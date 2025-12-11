@@ -34,6 +34,7 @@ type TestEnvironment struct {
 	Network *network.Network
 	Mongo   *mongo.Container
 	App     *app.Container
+	MockIAM *MockIAMContainer
 }
 
 // setupTestEnvironment — подготавливает тестовое окружение: сеть, контейнеры и возвращает структуру с ресурсами
@@ -56,7 +57,15 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	// Получаем порт gRPC для waitStrategy
 	grpcPort := getEnvWithLogging(ctx, grpcPortKey)
 
-	// Шаг 2: Запускаем контейнер с MongoDB
+	// Шаг 2: Запускаем mock IAM сервис
+	mockIAM := NewMockIAMContainer("0.0.0.0:50053")
+	err = mockIAM.Start(ctx)
+	if err != nil {
+		logger.Fatal(ctx, "не удалось запустить mock IAM сервис", zap.Error(err))
+	}
+	logger.Info(ctx, "✅ Mock IAM сервис успешно запущен")
+
+	// Шаг 3: Запускаем контейнер с MongoDB
 	generatedMongo, err := mongo.NewContainer(ctx,
 		mongo.WithNetworkName(generatedNetwork.Name()),
 		mongo.WithContainerName(testcontainers.MongoContainerName),
@@ -67,18 +76,21 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		mongo.WithAuthDB(mongoAuthDb),
 	)
 	if err != nil {
-		cleanupTestEnvironment(ctx, &TestEnvironment{Network: generatedNetwork})
+		cleanupTestEnvironment(ctx, &TestEnvironment{Network: generatedNetwork, MockIAM: mockIAM})
 		logger.Fatal(ctx, "не удалось запустить контейнер MongoDB", zap.Error(err))
 	}
 	logger.Info(ctx, "✅ Контейнер MongoDB успешно запущен")
 
-	// Шаг 3: Запускаем контейнер с приложением
+	// Шаг 4: Запускаем контейнер с приложением
 	projectRoot := path.GetProjectRoot()
 
 	appEnv := map[string]string{
 		// Переопределяем хост MongoDB для подключения к контейнеру из testcontainers
 		testcontainers.MongoHostKey: generatedMongo.Config().ContainerName,
 		testcontainers.MongoPortKey: testcontainers.MongoPort,
+		// Переопределяем адрес IAM сервиса на mock
+		"IAM_GRPC_HOST": "host.docker.internal",
+		"IAM_GRPC_PORT": "50053",
 	}
 
 	// Создаем настраиваемую стратегию ожидания с увеличенным таймаутом
@@ -96,7 +108,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		app.WithLogger(logger.Logger()),
 	)
 	if err != nil {
-		cleanupTestEnvironment(ctx, &TestEnvironment{Network: generatedNetwork, Mongo: generatedMongo})
+		cleanupTestEnvironment(ctx, &TestEnvironment{Network: generatedNetwork, Mongo: generatedMongo, MockIAM: mockIAM})
 		logger.Fatal(ctx, "не удалось запустить контейнер приложения", zap.Error(err))
 	}
 	logger.Info(ctx, "✅ Контейнер приложения успешно запущен")
@@ -106,6 +118,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		Network: generatedNetwork,
 		Mongo:   generatedMongo,
 		App:     appContainer,
+		MockIAM: mockIAM,
 	}
 }
 

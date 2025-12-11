@@ -7,6 +7,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	inventoryV1API "github.com/vipshark78/microservices-course-homeworks/inventory/internal/api/inventory/v1"
 	"github.com/vipshark78/microservices-course-homeworks/inventory/internal/config"
@@ -15,6 +18,9 @@ import (
 	"github.com/vipshark78/microservices-course-homeworks/inventory/internal/service"
 	inventoryService "github.com/vipshark78/microservices-course-homeworks/inventory/internal/service/part"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/closer"
+	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
+	grpcMidlleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
+	auth_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
 )
 
@@ -24,6 +30,7 @@ type diContainer struct {
 	inventoryRepository repository.InventoryRepository
 	mongoDBClient       *mongo.Client
 	mongoDBHandle       *mongo.Database
+	iamClient           grpcMidlleware.IAMClient
 }
 
 func NewDiContainer() *diContainer {
@@ -86,4 +93,31 @@ func (d *diContainer) MongoDBHandle(ctx context.Context) *mongo.Database {
 	}
 
 	return d.mongoDBHandle
+}
+
+func (d *diContainer) IAMClient(ctx context.Context) grpcMidlleware.IAMClient {
+	if d.iamClient == nil {
+		d.iamClient = auth_v1.NewAuthServiceClient(d.IAMConn(ctx))
+	}
+	return d.iamClient
+}
+
+func (d *diContainer) IAMConn(_ context.Context) *grpc.ClientConn {
+	conn, err := grpc.NewClient(
+		config.AppConfig().IAMGRPC.Address(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic(fmt.Sprintf("❌ Ошибка подключения к IAM Service: %v", err))
+	}
+
+	closer.AddNamed("IAM client", func(ctx context.Context) error {
+		if err := conn.Close(); err != nil {
+			logger.Error(ctx, "❌ Ошибка при закрытии подключения с IAM Service", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+
+	return conn
 }

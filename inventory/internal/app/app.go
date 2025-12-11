@@ -14,6 +14,7 @@ import (
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/closer"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/grpc/health"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
+	grpcMidlleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
 	"github.com/vipshark78/microservices-course-homeworks/shared/pkg/interceptors"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
 )
@@ -95,9 +96,13 @@ func (a *App) initListener(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
+	authMiddleware := grpcMidlleware.NewAuthInterceptor(a.diContainer.IAMClient(ctx))
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(interceptors.UnaryErrorInterceptor()),
+		grpc.ChainUnaryInterceptor(
+			interceptors.UnaryErrorInterceptor(),
+			authMiddleware.Unary(),
+		),
 	)
 	closer.AddNamed("gRPC server", func(ctx context.Context) error {
 		a.grpcServer.GracefulStop()

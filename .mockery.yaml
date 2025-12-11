@@ -63,3 +63,15 @@ packages:
   github.com/vipshark78/microservices-course-homeworks/notification/internal/config:
     config:
       include-regex: ".*Config"
+
+  github.com/vipshark78/microservices-course-homeworks/iam/internal/config:
+    config:
+      include-regex: ".*Config"
+
+  github.com/vipshark78/microservices-course-homeworks/iam/internal/service:
+    config:
+      include-regex: ".*Service"
+
+  github.com/vipshark78/microservices-course-homeworks/iam/internal/repository:
+    config:
+      include-regex: ".*Repository"
