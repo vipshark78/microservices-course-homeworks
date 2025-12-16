@@ -12,7 +12,7 @@ func (s *service) Whoami(ctx context.Context, sessionUuid string) (model.WhoamiR
 		return model.WhoamiResponse{}, err
 	}
 
-	user, err := s.userRepo.GetByUUID(ctx, session.UUID)
+	user, err := s.userRepo.GetByUUID(ctx, session.UUID())
 	if err != nil {
 		return model.WhoamiResponse{}, err
 	}

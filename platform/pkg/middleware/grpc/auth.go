@@ -4,27 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/session"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	authV1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/common/v1"
 )
 
 const (
 	// SessionUUIDMetadataKey ключ для передачи UUID сессии в gRPC metadata
 	SessionUUIDMetadataKey = "session-uuid"
-)
-
-type contextKey string
-
-const (
-	// userContextKey ключ для хранения пользователя в контексте
-	userContextKey contextKey = "user"
-	// sessionUUIDContextKey ключ для хранения session UUID в контексте
-	sessionUUIDContextKey contextKey = "session-uuid"
 )
 
 // IAMClient это алиас для сгенерированного gRPC клиента
@@ -87,31 +78,15 @@ func (i *AuthInterceptor) authenticate(ctx context.Context) (context.Context, er
 	}
 
 	// Добавляем пользователя и session UUID в контекст
-	authCtx := context.WithValue(ctx, userContextKey, whoamiRes.User)
-	authCtx = context.WithValue(authCtx, sessionUUIDContextKey, sessionUUID)
+	authCtx := context.WithValue(ctx, session.UserContextKey, whoamiRes.User)
+	authCtx = context.WithValue(authCtx, session.SessionUUIDContextKey, sessionUUID)
 	return authCtx, nil
-}
-
-// GetUserFromContext извлекает пользователя из контекста
-func GetUserFromContext(ctx context.Context) (*commonV1.User, bool) {
-	user, ok := ctx.Value(userContextKey).(*commonV1.User)
-	return user, ok
-}
-
-// GetUserContextKey возвращает ключ контекста для пользователя
-func GetUserContextKey() contextKey {
-	return userContextKey
 }
 
 // GetSessionUUIDFromContext извлекает session UUID из контекста
 func GetSessionUUIDFromContext(ctx context.Context) (string, bool) {
-	sessionUUID, ok := ctx.Value(sessionUUIDContextKey).(string)
+	sessionUUID, ok := ctx.Value(session.SessionUUIDContextKey).(string)
 	return sessionUUID, ok
-}
-
-// AddSessionUUIDToContext добавляет session UUID в контекст
-func AddSessionUUIDToContext(ctx context.Context, sessionUUID string) context.Context {
-	return context.WithValue(ctx, sessionUUIDContextKey, sessionUUID)
 }
 
 // ForwardSessionUUIDToGRPC добавляет session UUID из контекста в исходящие gRPC metadata

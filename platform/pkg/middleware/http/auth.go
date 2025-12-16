@@ -4,9 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	grpcAuth "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/grpc"
+	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/session"
 	authV1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/common/v1"
 )
 
 const SessionUUIDHeader = "X-Session-Uuid"
@@ -48,21 +47,16 @@ func (m *AuthMiddleware) Handle(next http.Handler) http.Handler {
 
 		// Добавляем пользователя и session UUID в контекст используя функции из grpc middleware
 		ctx := r.Context()
-		ctx = grpcAuth.AddSessionUUIDToContext(ctx, sessionUUID)
+		ctx = AddSessionUUIDToContext(ctx, sessionUUID)
 		// Также добавляем пользователя в контекст
-		ctx = context.WithValue(ctx, grpcAuth.GetUserContextKey(), whoamiRes.User)
+		ctx = context.WithValue(ctx, session.UserContextKey, whoamiRes.User)
 
 		// Передаем управление следующему handler
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-// GetUserFromContext извлекает пользователя из контекста
-func GetUserFromContext(ctx context.Context) (*commonV1.User, bool) {
-	return grpcAuth.GetUserFromContext(ctx)
-}
-
-// GetSessionUUIDFromContext извлекает session UUID из контекста
-func GetSessionUUIDFromContext(ctx context.Context) (string, bool) {
-	return grpcAuth.GetSessionUUIDFromContext(ctx)
+// AddSessionUUIDToContext добавляет session UUID в контекст
+func AddSessionUUIDToContext(ctx context.Context, sessionUUID string) context.Context {
+	return context.WithValue(ctx, session.SessionUUIDContextKey, sessionUUID)
 }

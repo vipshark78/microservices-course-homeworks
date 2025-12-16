@@ -37,7 +37,7 @@ func ConvertRepoUserModelToModel(repoUser repomodel.User) model.User {
 }
 
 func ConvertRepoNotificationMethodsToModel(notificationMethods []repomodel.NotificationMethod) []model.NotificationMethod {
-	var methods []model.NotificationMethod
+	methods := make([]model.NotificationMethod, 0, len(notificationMethods))
 	for _, method := range notificationMethods {
 		methods = append(methods, model.NotificationMethod{ProviderName: method.ProviderName, Target: method.Target})
 	}
