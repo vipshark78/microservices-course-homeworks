@@ -5,6 +5,9 @@ import "time"
 type LoggerConfig interface {
 	Level() string
 	AsJson() bool
+	EnableOTLP() bool
+	OtelCollectorEndpoint() string
+	ServiceName() string
 }
 
 type PostgresConfig interface {
@@ -25,4 +28,9 @@ type RedisConfig interface {
 
 type SessionConfig interface {
 	SessionTTL() time.Duration
+}
+
+type MetricsConfig interface {
+	CollectorEndpoint() string
+	CollectorInterval() time.Duration
 }

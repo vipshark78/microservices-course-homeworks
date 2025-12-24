@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 
 	kafkaConverter "github.com/vipshark78/microservices-course-homeworks/assembly/internal/converter/kafka"
+	"github.com/vipshark78/microservices-course-homeworks/assembly/internal/metrics"
 	assemblyService "github.com/vipshark78/microservices-course-homeworks/assembly/internal/service"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/kafka"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
@@ -30,9 +31,10 @@ func (s *service) RunConsumer(ctx context.Context) error {
 
 	err := s.orderPaidConsumer.Consume(ctx, s.OrderPaidHandler)
 	if err != nil {
+		metrics.IncResponseCounter(ctx, "error", "order_paid_consumer.RunConsumer")
 		logger.Error(ctx, "Consume from order.paid topic error", zap.Error(err))
 		return err
 	}
-
+	metrics.IncResponseCounter(ctx, "success", "order_paid_consumer.RunConsumer")
 	return nil
 }

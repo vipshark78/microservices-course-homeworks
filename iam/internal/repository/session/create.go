@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/vipshark78/microservices-course-homeworks/iam/internal/model"
 	"github.com/vipshark78/microservices-course-homeworks/iam/internal/repository/converter"
 )

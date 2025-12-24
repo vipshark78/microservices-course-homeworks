@@ -30,7 +30,7 @@ func NewSession(userUUID string, ttl time.Duration) (Session, error) {
 	}, nil
 }
 
-func NewSessionFromValues(uuid string, createdAt time.Time, updatedAt time.Time, expiresAt time.Time) Session {
+func NewSessionFromValues(uuid string, createdAt, updatedAt, expiresAt time.Time) Session {
 	return Session{
 		uuid:      uuid,
 		createdAt: createdAt,

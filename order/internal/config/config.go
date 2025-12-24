@@ -20,6 +20,8 @@ type config struct {
 	OrderAssembledConsumer OrderAssembledConsumerConfig
 	OrderPaidProducer      OrderPaidProducerConfig
 	IAMGRPC                IAMConfig
+	Metrics                MetricsConfig
+	Tracing                TracingConfig
 }
 
 func Load(path ...string) error {
@@ -73,6 +75,16 @@ func Load(path ...string) error {
 		return err
 	}
 
+	metricsCfg, err := env.NewMetricsConfig()
+	if err != nil {
+		return err
+	}
+
+	tracingCfg, err := env.NewTracingConfig()
+	if err != nil {
+		return err
+	}
+
 	appConfig = &config{
 		Logger:                 loggerCfg,
 		InventoryGRPC:          inventoryGRPCCfg,
@@ -83,6 +95,8 @@ func Load(path ...string) error {
 		OrderPaidProducer:      orderPaidProducerConfig,
 		Kafka:                  kafkaConfig,
 		IAMGRPC:                iamCfg,
+		Metrics:                metricsCfg,
+		Tracing:                tracingCfg,
 	}
 
 	return nil

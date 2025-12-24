@@ -11,9 +11,12 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/vipshark78/microservices-course-homeworks/order/internal/config"
+	orderMetrics "github.com/vipshark78/microservices-course-homeworks/order/internal/metrics"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/closer"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/logger"
+	platformMetrics "github.com/vipshark78/microservices-course-homeworks/platform/pkg/metrics"
 	httpMidlleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/http"
+	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/tracing"
 	order_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/openapi/order/v1"
 )
 
@@ -74,6 +77,8 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initLogger,
 		a.initCloser,
 		a.initHTTPServer,
+		a.initTracing,
+		a.initMetrics,
 	}
 
 	for _, f := range inits {
@@ -91,11 +96,56 @@ func (a *App) initDI(_ context.Context) error {
 	return nil
 }
 
-func (a *App) initLogger(_ context.Context) error {
-	return logger.Init(
+func (a *App) initTracing(ctx context.Context) error {
+	err := tracing.InitTracer(ctx, config.AppConfig().Tracing)
+	if err != nil {
+		return err
+	}
+
+	closer.AddNamed("tracer", tracing.ShutdownTracer)
+
+	return nil
+}
+
+func (a *App) initMetrics(ctx context.Context) error {
+	// Инициализируем платформенный провайдер метрик
+	// Это создает MeterProvider и настраивает отправку в OTLP Collector
+	err := platformMetrics.InitProvider(ctx, config.AppConfig().Metrics)
+	if err != nil {
+		return fmt.Errorf("failed to init metrics provider: %w", err)
+	}
+
+	// Инициализируем метрики Order сервиса
+	// Это создает конкретные метрики (OrdersTotal и OrdersRevenueTotal) через Meter
+	err = orderMetrics.InitMetrics()
+	if err != nil {
+		return fmt.Errorf("failed to init order metrics: %w", err)
+	}
+
+	return nil
+}
+
+func (a *App) initLogger(ctx context.Context) error {
+	err := logger.Init(
+		ctx,
 		config.AppConfig().Logger.Level(),
 		config.AppConfig().Logger.AsJson(),
+		config.AppConfig().Logger.EnableOTLP(),
+		config.AppConfig().Logger.OtelCollectorEndpoint(),
+		config.AppConfig().Logger.ServiceName(),
 	)
+	if err != nil {
+		return err
+	}
+
+	closer.AddNamed("Logger", func(ctx context.Context) error {
+		err = logger.CloseAndSync(ctx)
+		if err != nil {
+			err = fmt.Errorf("ошибка при закрытии логгера:%w", err)
+		}
+		return err
+	})
+	return nil
 }
 
 func (a *App) initCloser(_ context.Context) error {

@@ -34,6 +34,7 @@ import (
 	kafkaMiddleware "github.com/vipshark78/microservices-course-homeworks/platform/pkg/middleware/kafka"
 	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/migrator"
 	orderMigrator "github.com/vipshark78/microservices-course-homeworks/platform/pkg/migrator/pg"
+	"github.com/vipshark78/microservices-course-homeworks/platform/pkg/tracing"
 	order_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/openapi/order/v1"
 	auth_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1"
 	inventory_v1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1"
@@ -165,7 +166,13 @@ func (d *diContainer) PaymentClient(ctx context.Context) grpc.PaymentClient {
 
 func (d *diContainer) PaymentClientConn(ctx context.Context) *google_grpc.ClientConn {
 	if d.paymentClientConn == nil {
-		paymentClientConn, err := google_grpc.NewClient(config.AppConfig().PaymentGRPC.Address(), google_grpc.WithTransportCredentials(insecure.NewCredentials()))
+		paymentClientConn, err := google_grpc.NewClient(
+			config.AppConfig().PaymentGRPC.Address(),
+			google_grpc.WithTransportCredentials(insecure.NewCredentials()),
+			google_grpc.WithUnaryInterceptor(
+				tracing.UnaryClientInterceptor(config.AppConfig().Tracing.ServiceName()),
+			),
+		)
 		if err != nil {
 			logger.Fatal(ctx, "Ошибка подключения к сервису Payment", zap.Error(err))
 		}
