@@ -73,9 +73,9 @@ func (_c *SessionRepository_AddToUserSet_Call) RunAndReturn(run func(context.Con
 	return _c
 }
 
-// Create provides a mock function with given fields: ctx, userUUID
-func (_m *SessionRepository) Create(ctx context.Context, userUUID string) (string, error) {
-	ret := _m.Called(ctx, userUUID)
+// Create provides a mock function with given fields: ctx, session
+func (_m *SessionRepository) Create(ctx context.Context, session model.Session) (string, error) {
+	ret := _m.Called(ctx, session)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -83,17 +83,17 @@ func (_m *SessionRepository) Create(ctx context.Context, userUUID string) (strin
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
-		return rf(ctx, userUUID)
+	if rf, ok := ret.Get(0).(func(context.Context, model.Session) (string, error)); ok {
+		return rf(ctx, session)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
-		r0 = rf(ctx, userUUID)
+	if rf, ok := ret.Get(0).(func(context.Context, model.Session) string); ok {
+		r0 = rf(ctx, session)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, userUUID)
+	if rf, ok := ret.Get(1).(func(context.Context, model.Session) error); ok {
+		r1 = rf(ctx, session)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -108,14 +108,14 @@ type SessionRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userUUID string
-func (_e *SessionRepository_Expecter) Create(ctx interface{}, userUUID interface{}) *SessionRepository_Create_Call {
-	return &SessionRepository_Create_Call{Call: _e.mock.On("Create", ctx, userUUID)}
+//   - session model.Session
+func (_e *SessionRepository_Expecter) Create(ctx interface{}, session interface{}) *SessionRepository_Create_Call {
+	return &SessionRepository_Create_Call{Call: _e.mock.On("Create", ctx, session)}
 }
 
-func (_c *SessionRepository_Create_Call) Run(run func(ctx context.Context, userUUID string)) *SessionRepository_Create_Call {
+func (_c *SessionRepository_Create_Call) Run(run func(ctx context.Context, session model.Session)) *SessionRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		run(args[0].(context.Context), args[1].(model.Session))
 	})
 	return _c
 }
@@ -125,7 +125,7 @@ func (_c *SessionRepository_Create_Call) Return(_a0 string, _a1 error) *SessionR
 	return _c
 }
 
-func (_c *SessionRepository_Create_Call) RunAndReturn(run func(context.Context, string) (string, error)) *SessionRepository_Create_Call {
+func (_c *SessionRepository_Create_Call) RunAndReturn(run func(context.Context, model.Session) (string, error)) *SessionRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }

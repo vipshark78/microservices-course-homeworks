@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	grpcMocks "github.com/vipshark78/microservices-course-homeworks/order/internal/client/grpc/mocks"
+	"github.com/vipshark78/microservices-course-homeworks/order/internal/metrics"
 	repoMocks "github.com/vipshark78/microservices-course-homeworks/order/internal/repository/mocks"
 	serviceMocks "github.com/vipshark78/microservices-course-homeworks/order/internal/service/mocks"
 )
@@ -26,6 +27,7 @@ type ServiceSuite struct {
 }
 
 func (s *ServiceSuite) SetupTest() {
+	_ = metrics.InitMetrics()
 	s.ctx = context.Background()
 
 	s.repository = repoMocks.NewOrderRepository(s.T())

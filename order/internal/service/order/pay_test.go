@@ -28,8 +28,8 @@ func (s *ServiceSuite) TestOrderPaySuccess() {
 	)
 
 	s.repository.On("Read", s.ctx, orderUUID.String()).Return(order, nil).Once()
-	s.paymentClient.On("PayOrder", s.ctx, payOrder).Return(orderUUID.String(), nil).Once()
-	s.producerService.On("ProduceOrderPaid", s.ctx, mock.MatchedBy(func(event model.OrderPaidEvent) bool {
+	s.paymentClient.On("PayOrder", mock.Anything, payOrder).Return(orderUUID.String(), nil).Once()
+	s.producerService.On("ProduceOrderPaid", mock.Anything, mock.MatchedBy(func(event model.OrderPaidEvent) bool {
 		return event.OrderUUID == orderUUID.String() &&
 			event.UserUUID == orderUUID.String() &&
 			event.PaymentMethod == "SBP" &&
@@ -38,7 +38,7 @@ func (s *ServiceSuite) TestOrderPaySuccess() {
 	orderPaid := order
 	orderPaid.Status = model.OrderStatusPAID
 	orderPaid.TransactionUUID = lo.ToPtr(orderUUID.String())
-	s.repository.On("Update", s.ctx, orderPaid).Return(nil).Once()
+	s.repository.On("Update", mock.Anything, orderPaid).Return(nil).Once()
 
 	resp, err := s.service.OrderPay(s.ctx, orderUUID.String(), model.PaymentMethodSBP)
 
@@ -122,8 +122,8 @@ func (s *ServiceSuite) TestOrderPayErrorOrderUpdateError() {
 	)
 
 	s.repository.On("Read", s.ctx, orderUUID.String()).Return(order, nil).Once()
-	s.paymentClient.On("PayOrder", s.ctx, payOrder).Return(orderUUID.String(), nil).Once()
-	s.producerService.On("ProduceOrderPaid", s.ctx, mock.MatchedBy(func(event model.OrderPaidEvent) bool {
+	s.paymentClient.On("PayOrder", mock.Anything, payOrder).Return(orderUUID.String(), nil).Once()
+	s.producerService.On("ProduceOrderPaid", mock.Anything, mock.MatchedBy(func(event model.OrderPaidEvent) bool {
 		return event.OrderUUID == orderUUID.String() &&
 			event.UserUUID == orderUUID.String() &&
 			event.PaymentMethod == "SBP" &&
@@ -132,7 +132,7 @@ func (s *ServiceSuite) TestOrderPayErrorOrderUpdateError() {
 	orderPaid := order
 	orderPaid.Status = model.OrderStatusPAID
 	orderPaid.TransactionUUID = lo.ToPtr(orderUUID.String())
-	s.repository.On("Update", s.ctx, orderPaid).Return(model.ErrOrderNotFound).Once()
+	s.repository.On("Update", mock.Anything, orderPaid).Return(model.ErrOrderNotFound).Once()
 
 	resp, err := s.service.OrderPay(s.ctx, orderUUID.String(), model.PaymentMethodSBP)
 
