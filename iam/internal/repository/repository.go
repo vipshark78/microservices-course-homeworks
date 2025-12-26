@@ -14,6 +14,6 @@ type UserRepository interface {
 
 type SessionRepository interface {
 	Get(ctx context.Context, sessionUUID string) (model.Session, error)
-	Create(ctx context.Context, userUUID string) (string, error)
+	Create(ctx context.Context, session model.Session) (string, error)
 	AddToUserSet(ctx context.Context, userUUID, sessionUUID string) error
 }

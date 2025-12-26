@@ -2,9 +2,11 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/vipshark78/microservices-course-homeworks/iam/internal/model"
 	"github.com/vipshark78/microservices-course-homeworks/iam/internal/repository/converter"
@@ -18,10 +20,9 @@ func (r *repository) GetByUUID(ctx context.Context, userUUID string) (model.User
 			repomodel.ColumnUserInfoLogin,
 			repomodel.ColumnUserInfoEmail,
 			repomodel.ColumnUserInfoPasswordHash,
-			repomodel.ColumnUserInfoNotificationMethods,
 			repomodel.ColumnCreatedAt,
 			repomodel.ColumnUpdatedAt).
-		From(repomodel.TableName).
+		From(repomodel.UsersTableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{repomodel.ColumnUserUUID: userUUID})
 
@@ -35,14 +36,57 @@ func (r *repository) GetByLogin(ctx context.Context, login string) (model.User, 
 			repomodel.ColumnUserInfoLogin,
 			repomodel.ColumnUserInfoEmail,
 			repomodel.ColumnUserInfoPasswordHash,
-			repomodel.ColumnUserInfoNotificationMethods,
 			repomodel.ColumnCreatedAt,
 			repomodel.ColumnUpdatedAt).
-		From(repomodel.TableName).
+		From(repomodel.UsersTableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{repomodel.ColumnUserInfoLogin: login})
 
-	return r.GetUser(ctx, builderSelect)
+	user, err := r.GetUser(ctx, builderSelect)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	notificationMethods, err := r.GetNotificationMethods(ctx, user.UserUUID)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	user.UserInfo.NotificationMethods = converter.ConvertRepoNotificationMethodsToModel(notificationMethods)
+
+	return user, nil
+}
+
+func (r *repository) GetNotificationMethods(ctx context.Context, userUUID string) ([]repomodel.NotificationMethod, error) {
+	builderSelect := sq.
+		Select(
+			repomodel.ColumnNotificationProviderName,
+			repomodel.ColumnNotificationTarget,
+		).
+		From(repomodel.NotificationTableName).
+		PlaceholderFormat(sq.Dollar).
+		Where(sq.Eq{repomodel.ColumnUserUUID: userUUID})
+
+	query, args, err := builderSelect.ToSql()
+	if err != nil {
+		log.Printf("failed to build query: %v\n", err)
+		return []repomodel.NotificationMethod{}, err
+	}
+
+	var notificationMethods []repomodel.NotificationMethod
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		log.Printf("failed to select notificationMethods: %v\n", err)
+		return []repomodel.NotificationMethod{}, err
+	}
+
+	notificationMethods, err = pgx.CollectRows[repomodel.NotificationMethod](rows, pgx.RowToStructByName[repomodel.NotificationMethod])
+	if err != nil {
+		return []repomodel.NotificationMethod{}, fmt.Errorf("failed from collect notification methods: %w", err)
+	}
+
+	return notificationMethods, nil
 }
 
 func (r *repository) GetUser(ctx context.Context, builderSelect sq.SelectBuilder) (model.User, error) {
@@ -58,7 +102,6 @@ func (r *repository) GetUser(ctx context.Context, builderSelect sq.SelectBuilder
 		&user.UserInfo.Login,
 		&user.UserInfo.Email,
 		&user.UserInfo.PasswordHash,
-		&user.UserInfo.NotificationMethods,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)

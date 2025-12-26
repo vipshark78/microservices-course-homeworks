@@ -6,22 +6,18 @@ import (
 
 	"github.com/google/uuid"
 
-	repoModel "github.com/vipshark78/microservices-course-homeworks/iam/internal/repository/model"
+	"github.com/vipshark78/microservices-course-homeworks/iam/internal/model"
+	"github.com/vipshark78/microservices-course-homeworks/iam/internal/repository/converter"
 )
 
 const ttl = time.Hour * 24
 
-func (r *repository) Create(ctx context.Context, userUUID string) (string, error) {
-	session := repoModel.Session{
-		UserUUID:  userUUID,
-		CreatedAt: time.Now().Unix(),
-		ExpiresAt: time.Now().Add(ttl).Unix(),
-		UpdatedAt: time.Now().Unix(),
-	}
+func (r *repository) Create(ctx context.Context, session model.Session) (string, error) {
+	repoSession := converter.ConvertSessionModelToRepoModel(session)
 
 	sessionUUID := uuid.New().String()
 
-	err := r.cache.HashSet(ctx, sessionUUID, session)
+	err := r.cache.HashSet(ctx, sessionUUID, repoSession)
 	if err != nil {
 		return "", err
 	}
@@ -31,7 +27,7 @@ func (r *repository) Create(ctx context.Context, userUUID string) (string, error
 		return "", err
 	}
 
-	err = r.AddToUserSet(ctx, userUUID, sessionUUID)
+	err = r.AddToUserSet(ctx, repoSession.UserUUID, sessionUUID)
 	if err != nil {
 		return "", err
 	}

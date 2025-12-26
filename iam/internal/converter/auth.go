@@ -17,9 +17,9 @@ func ConvertServiceWhoamiRespToProtoModel(response model.WhoamiResponse) *auth_v
 
 func ConvertServiceSessionToProtoModel(session model.Session) *common_v1.Session {
 	return &common_v1.Session{
-		Uuid:      session.UUID,
-		CreatedAt: timestamppb.New(session.CreatedAt),
-		UpdatedAt: timestamppb.New(session.UpdatedAt),
-		ExpiresAt: timestamppb.New(session.ExpiresAt),
+		Uuid:      session.UUID(),
+		CreatedAt: timestamppb.New(session.CreatedAt()),
+		UpdatedAt: timestamppb.New(session.UpdatedAt()),
+		ExpiresAt: timestamppb.New(session.ExpiresAt()),
 	}
 }

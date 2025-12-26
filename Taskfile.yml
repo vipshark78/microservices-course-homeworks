@@ -711,7 +711,6 @@ tasks:
             exit 1
           fi
         fi
-        
         chmod +x "$SCRIPT"
         # Передаем список сервисов в виде строки с разделителями-запятыми
         export SERVICES="{{.SERVICES}}"

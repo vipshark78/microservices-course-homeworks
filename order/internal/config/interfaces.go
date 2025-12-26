@@ -9,6 +9,9 @@ import (
 type LoggerConfig interface {
 	Level() string
 	AsJson() bool
+	EnableOTLP() bool
+	OtelCollectorEndpoint() string
+	ServiceName() string
 }
 
 type PaymentGRPCConfig interface {
@@ -49,4 +52,16 @@ type OrderAssembledConsumerConfig interface {
 
 type IAMConfig interface {
 	Address() string
+}
+
+type MetricsConfig interface {
+	CollectorEndpoint() string
+	CollectorInterval() time.Duration
+}
+
+type TracingConfig interface {
+	CollectorEndpoint() string
+	ServiceName() string
+	Environment() string
+	ServiceVersion() string
 }
