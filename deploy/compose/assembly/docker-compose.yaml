@@ -1,5 +1,5 @@
 services: # Раздел, в котором описываются все контейнеры, необходимые для Assembly-сервиса
-  # Assembly Kafka Consumer/Producer сервер
+  # Assembly сервер
   assembly-server:
     build:
       context: ../../..
