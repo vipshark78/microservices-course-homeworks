@@ -43,8 +43,8 @@ ADD https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.3
 # Делаем скачанный файл исполняемым
 RUN chmod +x grpc-health-probe
 
-# Собираем бинарный файл Inventory-сервиса для Linux-архитектуры без CGO
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app-inventory ./inventory/cmd/main.go
+# Собираем бинарный файл Payment-сервиса для Linux-архитектуры без CGO
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app-payment ./payment/cmd/main.go
 
 
 # ============================
@@ -64,16 +64,17 @@ WORKDIR /app
 USER appuser
 
 # Копируем скомпилированный бинарник из стадии builder
-COPY --from=builder /app/app-inventory .
+COPY --from=builder /app/app-payment .
 
 # Копируем бинарь grpc-health-probe в /bin
 COPY --from=builder /app/grpc-health-probe /bin/grpc-health-probe
 
 # Копируем .env файл для конфигурации приложения
-COPY deploy/compose/inventory/.env /deploy/compose/inventory/.env
+COPY deploy/compose/payment/.env /deploy/compose/payment/.env
 
-# Экспонируем порт gRPC-сервиса Inventory
-EXPOSE 50051
+# Экспонируем порт gRPC-сервиса Payment
+EXPOSE 50052
 
 # Устанавливаем команду запуска — запускаем наш бинарь
-ENTRYPOINT ["./app-inventory"]
+ENTRYPOINT ["./app-payment"]
+

@@ -12,7 +12,6 @@ func (a *api) Whoami(ctx context.Context, req *authV1.WhoamiRequest) (*authV1.Wh
 	if req.SessionUuid == "" {
 		return &authV1.WhoamiResponse{}, model.ErrInvalidSessionUUID
 	}
-
 	resp, err := a.service.Whoami(ctx, req.SessionUuid)
 	if err != nil {
 		return &authV1.WhoamiResponse{}, err

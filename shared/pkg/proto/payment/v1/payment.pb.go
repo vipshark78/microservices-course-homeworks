@@ -24,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-//PaymentMethod перечисление способов оплаты
+// PaymentMethod перечисление способов оплаты
 type PaymentMethod int32
 
 const (

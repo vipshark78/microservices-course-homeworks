@@ -25,7 +25,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-//Category перечисление категорий детали
+// Category перечисление категорий детали
 type Category int32
 
 const (
@@ -270,7 +270,7 @@ func (x *ListPartsResponse) GetParts() []*Part {
 	return nil
 }
 
-//Part информация о детали
+// Part информация о детали
 type Part struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Уникальный идентификатор детали
@@ -415,7 +415,7 @@ func (x *Part) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-//Dimensions Размеры детали
+// Dimensions Размеры детали
 type Dimensions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	//Длина в см
@@ -488,7 +488,7 @@ func (x *Dimensions) GetWeight() float64 {
 	return 0
 }
 
-//Manufacturer информация о производителе
+// Manufacturer информация о производителе
 type Manufacturer struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	//Название
@@ -552,7 +552,7 @@ func (x *Manufacturer) GetWebsite() string {
 	return ""
 }
 
-//Value значение metadata
+// Value значение metadata
 type Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to ValueType:
@@ -671,7 +671,7 @@ func (*Value_DoubleValue) isValue_ValueType() {}
 
 func (*Value_BooleanValue) isValue_ValueType() {}
 
-//PartsFilter Фильтр по деталям
+// PartsFilter Фильтр по деталям
 type PartsFilter struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	//Список UUID'ов. Пусто — не фильтруем по UUID
@@ -819,10 +819,10 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\x06ENGINE\x10\x01\x12\b\n" +
 	"\x04FUEL\x10\x02\x12\f\n" +
 	"\bPORTHOLE\x10\x03\x12\b\n" +
-	"\x04WING\x10\x042\xed\x01\n" +
-	"\x10InventoryService\x12h\n" +
-	"\aGetPart\x12\x1c.inventory.v1.GetPartRequest\x1a\x1d.inventory.v1.GetPartResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/inventory/{uuid}\x12o\n" +
-	"\tListParts\x12\x1e.inventory.v1.ListPartsRequest\x1a\x1f.inventory.v1.ListPartsResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/inventory/listBaZ_github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1;inventory_v1b\x06proto3"
+	"\x04WING\x10\x042\x81\x02\n" +
+	"\x10InventoryService\x12r\n" +
+	"\aGetPart\x12\x1c.inventory.v1.GetPartRequest\x1a\x1d.inventory.v1.GetPartResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/inventory/api/v1/inventory/{uuid}\x12y\n" +
+	"\tListParts\x12\x1e.inventory.v1.ListPartsRequest\x1a\x1f.inventory.v1.ListPartsResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /inventory/api/v1/inventory/listBaZ_github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/inventory/v1;inventory_v1b\x06proto3"
 
 var (
 	file_inventory_v1_inventory_proto_rawDescOnce sync.Once

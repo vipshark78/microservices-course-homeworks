@@ -13,3 +13,7 @@ plugins:
     out: ../../shared/pkg/proto
     opt:
       - paths=source_relative
+
+  - plugin: buf.build/protocolbuffers/descriptor
+    out: inventory_descriptor.pb
+    opt: include_imports,include_source_info

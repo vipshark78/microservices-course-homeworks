@@ -8,7 +8,7 @@ import (
 	authV1 "github.com/vipshark78/microservices-course-homeworks/shared/pkg/proto/auth/v1"
 )
 
-const SessionUUIDHeader = "X-Session-Uuid"
+const SessionUUIDHeader = "Session-Uuid"
 
 // IAMClient это алиас для сгенерированного gRPC клиента
 type IAMClient = authV1.AuthServiceClient
@@ -31,11 +31,11 @@ func (m *AuthMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Извлекаем session UUID из заголовка
 		sessionUUID := r.Header.Get(SessionUUIDHeader)
+
 		if sessionUUID == "" {
 			writeErrorResponse(w, http.StatusUnauthorized, "MISSING_SESSION", "Authentication required")
 			return
 		}
-
 		// Валидируем сессию через IAM сервис
 		whoamiRes, err := m.iamClient.Whoami(r.Context(), &authV1.WhoamiRequest{
 			SessionUuid: sessionUUID,

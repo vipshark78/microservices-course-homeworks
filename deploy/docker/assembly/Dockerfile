@@ -37,14 +37,8 @@ COPY assembly ./assembly
 COPY notification ./notification
 COPY iam ./iam
 
-# Скачиваем grpc-health-probe — это утилита для проверки состояния gRPC-сервиса
-ADD https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.37/grpc_health_probe-linux-amd64 ./grpc-health-probe
-
-# Делаем скачанный файл исполняемым
-RUN chmod +x grpc-health-probe
-
-# Собираем бинарный файл Inventory-сервиса для Linux-архитектуры без CGO
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app-inventory ./inventory/cmd/main.go
+# Собираем бинарный файл Assembly-сервиса для Linux-архитектуры без CGO
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app-assembly ./assembly/cmd/main.go
 
 
 # ============================
@@ -64,16 +58,12 @@ WORKDIR /app
 USER appuser
 
 # Копируем скомпилированный бинарник из стадии builder
-COPY --from=builder /app/app-inventory .
-
-# Копируем бинарь grpc-health-probe в /bin
-COPY --from=builder /app/grpc-health-probe /bin/grpc-health-probe
+COPY --from=builder /app/app-assembly .
 
 # Копируем .env файл для конфигурации приложения
-COPY deploy/compose/inventory/.env /deploy/compose/inventory/.env
-
-# Экспонируем порт gRPC-сервиса Inventory
-EXPOSE 50051
+COPY deploy/compose/assembly/.env /deploy/compose/assembly/.env
 
 # Устанавливаем команду запуска — запускаем наш бинарь
-ENTRYPOINT ["./app-inventory"]
+ENTRYPOINT ["./app-assembly"]
+
+
