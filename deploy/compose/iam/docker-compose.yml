@@ -1,4 +1,23 @@
 services: # Раздел, в котором описываются все контейнеры, необходимые для IAM-сервиса
+  # IAM gRPC сервер
+  iam-grpc-server:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/iam/Dockerfile
+    container_name: iam-grpc-server
+    env_file:
+      - .env
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    healthcheck:
+      test: [ "CMD", "/bin/grpc-health-probe", "-addr=localhost:${GRPC_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - microservices-net
 
   postgres-iam: # Сервис с PostgreSQL, используемый IAM-сервисом для хранения данных пользователей
     image: postgres:17.0-alpine3.20 # Используем официальный образ PostgreSQL 17 на базе Alpine — он лёгкий и быстрый

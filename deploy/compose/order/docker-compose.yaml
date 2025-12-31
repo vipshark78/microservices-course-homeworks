@@ -1,4 +1,26 @@
 services: # Раздел, описывающий контейнеры, которые требуются для работы Order-сервиса
+  # Order HTTP сервер
+  order-http-server:
+    build:
+      context: ../../..
+      dockerfile: deploy/docker/order/Dockerfile
+    container_name: order-http-server
+    env_file:
+      - .env
+    # Порт не пробрасывается наружу, так как доступ к Order сервису осуществляется через Envoy
+    # Envoy проксирует запросы на order-http-server внутри Docker сети
+    depends_on:
+      postgres-order:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost ${HTTP_PORT} || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - microservices-net
 
   postgres-order: # Контейнер с PostgreSQL, используемый для хранения данных заказов
     image: postgres:17.0-alpine3.20

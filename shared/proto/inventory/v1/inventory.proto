@@ -14,14 +14,14 @@ service InventoryService {
   //Возвращает информацию о детали по её UUID
   rpc GetPart(GetPartRequest) returns (GetPartResponse){
     option (google.api.http) = {
-      get: "/api/v1/inventory/{uuid}"
+      get: "/inventory/api/v1/inventory/{uuid}"
     };
   }
 
   //Возвращает список деталей с возможностью фильтрации
   rpc ListParts(ListPartsRequest) returns (ListPartsResponse){
     option (google.api.http) = {
-      post: "/api/v1/inventory/list"
+      post: "/inventory/api/v1/inventory/list"
       body: "*"
     };
   }

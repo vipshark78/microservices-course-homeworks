@@ -19,7 +19,6 @@ func (r *repository) Get(ctx context.Context, sessionUUID string) (model.Session
 		}
 		return model.Session{}, err
 	}
-
 	if len(values) == 0 {
 		return model.Session{}, model.ErrSessionNotFound
 	}

@@ -1,0 +1,57 @@
+services:
+  # Envoy Proxy (API Gateway с аутентификацией)
+  envoy:
+    image: envoyproxy/envoy:v1.34.0
+    container_name: envoy
+    # Примечание: depends_on не работает для сервисов из других docker-compose файлов.
+    # Запускаем order-http-server, inventory-grpc-server и iam-grpc-server
+    # перед запуском envoy через task up-all.
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ../../../shared/pkg/proto:/etc/envoy/proto
+    ports:
+      - "8080:8080"      # HTTP API с аутентификацией
+      - "8081:8081"      # Envoy admin interface
+    environment:
+      - ENVOY_UID=0  # Права для доступа к файлам
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/8081'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - microservices-net
+      # Подключаем контейнер к общей сети, в которой живут все сервисы микросервисной архитектуры
+
+networks:
+  microservices-net:
+    external: true
+    # Подключаемся к внешней сети, созданной в core docker-compose.yml
+
+# ===============================
+# АРХИТЕКТУРА СИСТЕМЫ:
+# ===============================
+# 1. order-http-server - Order сервис (HTTP API)
+# 2. inventory-grpc-server - Inventory сервис (gRPC API)
+# 3. iam-grpc-server - IAM сервис (аутентификация через ext_authz)
+# 4. envoy:8080 - HTTP API Gateway с аутентификацией
+# 5. envoy:8081 - Admin interface для мониторинга
+
+# ===============================
+# ПОТОК ОБРАБОТКИ ЗАПРОСА:
+# ===============================
+# HTTP Client → envoy:8080 (с Session-UUID) →
+# → ext_authz → iam-grpc-server (Check) →
+# → order-http-server (HTTP↔HTTP) или inventory-grpc-server (HTTP↔gRPC через transcoder) →
+# → JSON Response → HTTP Client
+
+# ===============================
+# КОМАНДЫ ДЛЯ ЗАПУСКА:
+# ===============================
+# docker-compose up --build -d      # Запуск всех сервисов
+# docker-compose ps                 # Проверка статуса
+# docker-compose logs -f envoy      # Логи Envoy
+# docker-compose logs -f iam-grpc-server  # Логи IAM
+# docker-compose down               # Остановка всех сервисов

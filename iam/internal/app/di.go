@@ -3,12 +3,14 @@ package app
 import (
 	"context"
 
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	redigo "github.com/gomodule/redigo/redis"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 
 	authV1API "github.com/vipshark78/microservices-course-homeworks/iam/internal/api/auth/v1"
+	authzV1API "github.com/vipshark78/microservices-course-homeworks/iam/internal/api/authz/v1"
 	userV1API "github.com/vipshark78/microservices-course-homeworks/iam/internal/api/user/v1"
 	"github.com/vipshark78/microservices-course-homeworks/iam/internal/config"
 	"github.com/vipshark78/microservices-course-homeworks/iam/internal/repository"
@@ -31,6 +33,7 @@ type diContainer struct {
 	authV1API         authV1.AuthServiceServer
 	userV1API         userV1.UserServiceServer
 	authService       service.AuthService
+	authzV1API        authv3.AuthorizationServer
 	userService       service.UserService
 	userRepository    repository.UserRepository
 	sessionRepository repository.SessionRepository
@@ -145,4 +148,11 @@ func (d *diContainer) RedisPool(ctx context.Context) *redigo.Pool {
 		}
 	}
 	return d.redisPool
+}
+
+func (d *diContainer) AuthzV1API(ctx context.Context) authv3.AuthorizationServer {
+	if d.authzV1API == nil {
+		d.authzV1API = authzV1API.NewAPI(d.AuthService(ctx))
+	}
+	return d.authzV1API
 }

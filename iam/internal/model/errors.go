@@ -11,4 +11,5 @@ var (
 	ErrInvalidUserInfo    = errors.New("invalid user info")
 	ErrInvalidPassword    = errors.New("invalid password")
 	ErrInvalidRequest     = errors.New("invalid request")
+	ErrSessionExpired     = errors.New("session expired")
 )
